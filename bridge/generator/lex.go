@@ -8,7 +8,7 @@ func main() {
 	// Create frontend printers
 	printers := []Printer{
 		NewBasicPrinter("go", "templates/template.go.", "dist/bridge.go"),
-		NewBasicPrinter("py", "templates/template.py", "dist/python/flywheel.py"),
+		NewBasicPrinter("py", "templates/template.py", "dist/python/flywheel/flywheel.py"),
 		NewBasicPrinter("m", "templates/template.m", "dist/matlab/Flywheel.m"),
 		NewBasicPrinter("m-binary", "templates/template.binary.m", "dist/matlab-binary/Flywheel.m"),
 		NewBasicPrinter("cli", "templates/template.binary", "dist/binary/sdk.go"),
