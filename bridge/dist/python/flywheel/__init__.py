@@ -1,1 +1,1 @@
-from flywheel import *
+from .flywheel import *
