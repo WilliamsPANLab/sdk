@@ -8,7 +8,11 @@ install_requires = [
 
 setup(
     name = 'flywheel',
-    version = '0.0.1',
+    
+    # Keep this in sync with /sdk.go !
+    version = '0.2.0',
+    
+    
     description = 'Flywheel Python SDK',
     author = 'Nathaniel Kofalt',
     author_email = 'nathanielkofalt@flywheel.io',
