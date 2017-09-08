@@ -68,6 +68,11 @@ Add note to a container                          | X       | X      | X      | X
 Upload tag to a container                        | X       | X      | X      | X
 Get jobs that involve container                  |         |        |        |
 &nbsp;                                           |         |        |        |
+Set file attributes                              | X       | X      | X      | X
+Set file info fields                             | X       | X      | X      | X
+Replaces all file info fields                    | X       | X      | X      | X
+Delete file info fields                          | X       | X      | X      | X
+&nbsp;                                           |         |        |        |
 Get all collections                              | X       | X      | X      | X
 Get collection                                   | X       | X      | X      | X
 Add collection                                   | X       | X      | X      | X
@@ -80,7 +85,8 @@ Get collection's session's acquisitions          | X       | X      | X      | X
 Delete collection                                | X       | X      | X      | X
 Add note to a collection                         | X       | X      | X      | X
 &nbsp;                                           |         |        |        |
-Support for analyses                             |         |        |        |
+Create analysis                                  | X       |        |        |
+Add note to analysis                             | X       | X      | X      | X
 &nbsp;                                           |         |        |        |
 Resolve path to route                            |         |        |        |
 &nbsp;                                           |         |        |        |

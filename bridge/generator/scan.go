@@ -217,6 +217,9 @@ func GetRelevantFunctionSignatures(path string) (*token.FileSet, []*ast.FuncDecl
 			"DownloadFromSession",
 			"DownloadFromAcquisition",
 			"DownloadFromCollection",
+
+			// Two complex data types in one signature
+			"AddSessionAnalysis",
 		}
 		if stringInSlice(name, blacklist) {
 			return false
