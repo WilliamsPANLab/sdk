@@ -41,6 +41,8 @@ type Session struct {
 	Public      bool          `json:"public,omitempty"`
 	Archived    *bool         `json:"archived,omitempty"`
 	Permissions []*Permission `json:"permissions,omitempty"`
+
+	Analyses []*Analysis `json:"analyses,omitempty"`
 }
 
 func (c *Client) GetAllSessions() ([]*Session, *http.Response, error) {

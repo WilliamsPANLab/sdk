@@ -17,6 +17,15 @@ type Permission struct {
 	Level string `json:"access"`
 }
 
+type Note struct {
+	Id     string `json:"id,omitempty"`
+	UserId string `json:"user,omitempty"`
+	Text   string `json:"text,omitempty"`
+
+	Created  *time.Time `json:"created,omitempty"`
+	Modified *time.Time `json:"modified,omitempty"`
+}
+
 type Origin struct {
 	Id     string `json:"id,omitempty"`
 	Method string `json:"method,omitempty"`
@@ -54,13 +63,4 @@ type ModifiedAndJobsResponse struct {
 // DeleteResponse is used for endpoints that respond with a count of deleted objects.
 type DeletedResponse struct {
 	DeletedCount int `json:"deleted"`
-}
-
-type Note struct {
-	Id     string `json:"id,omitempty"`
-	UserId string `json:"user,omitempty"`
-	Text   string `json:"text,omitempty"`
-
-	Created  *time.Time `json:"created,omitempty"`
-	Modified *time.Time `json:"modified,omitempty"`
 }

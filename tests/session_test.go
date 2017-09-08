@@ -56,6 +56,7 @@ func (t *F) TestSessions() {
 	rSession.Notes = nil
 	rSession.Tags = nil
 	rSession.Info = nil
+	rSession.Analyses = nil
 	rSession.Subject = &api.Subject{
 		Id:   rSession.Subject.Id,
 		Code: rSession.Subject.Code,

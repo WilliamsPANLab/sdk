@@ -37,14 +37,14 @@ type Gear struct {
 type GearCategory string
 
 const (
-	Utility  GearCategory = "utility"
-	Analysis GearCategory = "analysis"
+	UtilityGear  GearCategory = "utility"
+	AnalysisGear GearCategory = "analysis"
 
 	// Legacy category; equivalent to Utility
-	Converter GearCategory = "converter"
+	ConverterGear GearCategory = "converter"
 
 	// Legacy category; equivalent to Utility
-	Qa GearCategory = "qa"
+	QaGear GearCategory = "qa"
 )
 
 type GearDoc struct {
