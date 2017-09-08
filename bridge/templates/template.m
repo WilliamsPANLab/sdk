@@ -60,7 +60,7 @@ classdef Flywheel
             {{if ne .ParamDataName ""}}oldField = 'id';
             newField = 'x0x5F_id';
             {{.ParamDataName}} = Flywheel.replaceField({{.ParamDataName}},oldField,newField);
-            {{.ParamDataName}} = savejson('',{{.ParamDataName}});
+            {{.ParamDataName}} = savejson('',{{.ParamDataName}},'ParseLogical',1);
             {{end -}}
             pointer = calllib('flywheelBridge','{{.Name}}',obj.key,{{range .Params}}{{.Name}},{{end -}} statusPtr);
             result = Flywheel.handleJson(statusPtr,pointer);
