@@ -22,6 +22,9 @@ type Gear struct {
 	Inputs map[string]map[string]interface{} `json:"inputs"`
 	Config map[string]map[string]interface{} `json:"config"`
 
+	Environment map[string]string `json:"environment,omitempty"`
+	Command     string            `json:"command,omitempty"`
+
 	Author     string `json:"author,omitempty"`
 	Maintainer string `json:"maintainer,omitempty"`
 	License    string `json:"license,omitempty"`
