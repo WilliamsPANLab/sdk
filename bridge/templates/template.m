@@ -60,6 +60,7 @@ classdef Flywheel
             {{if ne .ParamDataName ""}}oldField = 'id';
             newField = 'x0x5Fid';
             {{.ParamDataName}} = Flywheel.replaceField({{.ParamDataName}},oldField,newField);
+            % Indicate to JSONio to replace hex values with corresponding character, i.e. 'x0x5F' -> '_' and '0x2D' -> '-'
             opts = struct('replacementStyle','hex');
             {{.ParamDataName}} = jsonwrite({{.ParamDataName}},opts);
             {{end -}}
