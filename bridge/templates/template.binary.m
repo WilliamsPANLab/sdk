@@ -17,13 +17,13 @@ classdef Flywheel
                 throw(ME)
             end
             obj.key = apiKey;
-            % Check if JSONlab is in path
-            if ~exist('savejson')
-                ME = MException('FlywheelException:JSONlab', 'JSONlab function savejson is not loaded. Please install JSONlab and add to path.')
+            % Check if JSONio is in path
+            if ~exist('jsonread')
+                ME = MException('FlywheelException:JSONio', 'JSONio function jsonsave is not loaded. Please install JSONio and add to path.')
                 throw(ME)
             end
-            if ~exist('loadjson')
-                ME = MException('FlywheelException:JSONlab', 'JSONlab function loadjson is not loaded. Please install JSONlab and add to path.')
+            if ~exist('jsonwrite')
+                ME = MException('FlywheelException:JSONio', 'JSONio function jsonwrite is not loaded. Please install JSONio and add to path.')
                 throw(ME)
             end
 
@@ -59,9 +59,11 @@ classdef Flywheel
             % {{camel2lowercamel .Name}}({{range $ind, $val := .Params}}{{.Name}}{{if lt $ind $length}}, {{end}}{{end -}})
 
             {{if ne .ParamDataName ""}}oldField = 'id';
-            newField = 'x0x5F_id';
+            newField = 'x0x5Fid';
             {{.ParamDataName}} = Flywheel.replaceField({{.ParamDataName}},oldField,newField);
-            {{.ParamDataName}} = savejson('',{{.ParamDataName}},'ParseLogical',1);
+            % Indicate to JSONio to replace hex values with corresponding character, i.e. 'x0x5F' -> '_' and '0x2D' -> '-'
+            opts = struct('replacementStyle','hex');
+            {{.ParamDataName}} = jsonwrite({{.ParamDataName}},opts);
             {{end -}}
             [status,cmdout] = system([obj.folder '/sdk {{.Name}} ' obj.key ' ' {{range .Params}} '''' {{.Name}} ''' '{{end -}}]);
 
@@ -75,23 +77,23 @@ classdef Flywheel
             version = '{{.Version}}';
         end
         function structFromJson = handleJson(statusPtr,ptrValue)
-            % Handle JSON using JSONlab
+            % Handle JSON using JSONio
             statusValue = statusPtr;
 
             % If status indicates success, load JSON
             if statusValue == 0
                 % Interpret JSON string blob as a struct object
-                loadedJson = loadjson(ptrValue);
+                loadedJson = jsonread(ptrValue);
                 % loadedJson contains status, message and data, only return
                 %   the data information.
                 dataFromJson = loadedJson.data;
                 %  Call replaceField on loadedJson to replace x0x5F_id with id
-                structFromJson = Flywheel.replaceField(dataFromJson,'x0x5F_id','id');
+                structFromJson = Flywheel.replaceField(dataFromJson,'x_id','id');
             % Otherwise, nonzero statusCode indicates an error
             else
                 % Try to load message from the JSON
                 try
-                    loadedJson = loadjson(ptrValue);
+                    loadedJson = jsonread(ptrValue);
                     msg = loadedJson.message;
                     ME = MException('FlywheelException:handleJson', msg);
                 % If unable to load message, throw an 'unknown' error

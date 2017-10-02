@@ -4,7 +4,7 @@ import (
 	_ "flywheel.io/sdk/api"
 )
 
-var Version = "0.2.0"
+var Version = "0.2.1"
 
 func main() {
 

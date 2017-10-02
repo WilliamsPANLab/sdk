@@ -8,7 +8,7 @@ disp('Setup')
 %       ex: setenv('SdkTestKey', APIKEY)
 
 % Create string to be used in testdrive
-testString = '123235jakhf7sadf7v';
+testString = 'aeu84sdfarew2h23333';
 % A test file
 filename = 'test.txt';
 fid = fopen(filename, 'w');
