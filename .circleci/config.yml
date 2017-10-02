@@ -131,8 +131,8 @@ jobs:
             - run:
                 name: Build and Test Wheel
                 command: |
-                  python2 setup.py bdist_wheel --plat-name linux_x86_64 --dist-dir wheelhouse
-                  python3 setup.py bdist_wheel --plat-name linux_x86_64 --dist-dir wheelhouse
+                  python2 setup.py bdist_wheel --plat-name `python -c "import distutils.util; print(distutils.util.get_platform())"` --dist-dir wheelhouse
+                  python3 setup.py bdist_wheel --plat-name `python -c "import distutils.util; print(distutils.util.get_platform())"` --dist-dir wheelhouse
                   cd wheelhouse
                   pip install "$(find -name *py2*.whl)"
                   python ../test-drive.py
