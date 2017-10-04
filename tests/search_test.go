@@ -10,7 +10,7 @@ import (
 
 // Ref https://github.com/flywheel-io/sdk/issues/31
 func (t *F) SkipTestSearch() {
-	_, _, sessionId, acquisitionId := t.createTestAcquisition()
+	_, _, _, acquisitionId := t.createTestAcquisition()
 
 	// Get Acquisition
 	a, _, err := t.GetAcquisition(acquisitionId)
@@ -26,8 +26,7 @@ func (t *F) SkipTestSearch() {
 	sR, _, err := t.Search(s)
 	// t.So(a.Name, ShouldBeNil)
 	t.So(err, ShouldBeNil)
-	t.So(len(sR.Results), ShouldEqual, 1)
-	t.So(sR.Results[0].Source.Session.Id, ShouldEqual, sessionId)
+	t.So(len(sR), ShouldEqual, 1)
 
 	s = &api.SearchQuery{
 		ReturnType:   api.AcquisitionString,
@@ -37,6 +36,5 @@ func (t *F) SkipTestSearch() {
 	sR, _, err = t.Search(s)
 	// t.So(a.Name, ShouldBeNil)
 	t.So(err, ShouldBeNil)
-	t.So(len(sR.Results), ShouldEqual, 1)
-	t.So(sR.Results[0].Source.Acquisition.Id, ShouldEqual, acquisitionId)
+	t.So(len(sR), ShouldEqual, 1)
 }

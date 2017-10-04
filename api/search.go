@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"strconv"
 )
 
 // Enum for Return Types.
@@ -14,14 +15,23 @@ const (
 	AnalysisString    SearchType = "analysis"
 )
 
-// A single search query made to the API
 type SearchQuery struct {
-	ReturnType SearchType `json:"return_type"` // REQUIRED file|acquisition|session|analysis
+	// ReturnType sets the type of search results.
+	ReturnType SearchType `json:"return_type"`
 
-	SearchString string        `json:"search_string,omitempty"` // OPTIONAL KEY any string including spaces and special characters
-	AllData      bool          `json:"all_data,omitempty"`      // OPTIONAL, DEFAULTS TO FALSE true|false
-	Filters      []interface{} `json:"filters,omitempty"`       // A LIST OF ES FILTERS, OPTIONAL KEY, find list of available filters here: https://www.elastic.co/guide/en/elasticsearch/reference/current/term-level-queries.html
-	Size         string        `json:"size,omitempty"`          // OPTIONAL KEY if it is all, all files/other containers are returned
+	// SearchString represents the search query.
+	SearchString string `json:"search_string,omitempty"`
+
+	// Limit determines the maximum number of search results.
+	// Set to a negative value to return all results. Set to zero to use a default limit.
+	Limit int `json:"limit,omitempty"`
+
+	// IncludeInaccessible, when set, will include data that the current user does not have access to read.
+	IncludeInaccessible bool `json:"all_data,omitempty"`
+
+	// Filters is a set of ElasticSearch filters to use in the search.
+	// https://www.elastic.co/guide/en/elasticsearch/reference/current/term-level-queries.html
+	Filters []interface{} `json:"filters,omitempty"`
 }
 
 type ProjectSearchResponse struct {
@@ -33,7 +43,9 @@ type GroupSearchResponse struct {
 	Name string `json:"label,omitempty"`
 }
 
-// Runnning into Parsing errors when using time.Time
+// Timestamp fields should be time.Time
+// https://github.com/flywheel-io/sdk/issues/52
+
 type SessionSearchResponse struct {
 	Id        string `json:"_id,omitempty"`
 	Archived  bool   `json:"archived,omitempty"`
@@ -69,8 +81,8 @@ type ParentSearchResponse struct {
 	Id   string `json:"_id,omitempty"`
 }
 
-// SourceResponse for the SearchResponse
-type SourceResponse struct {
+// SearchResponse for the SearchResponse
+type SearchResponse struct {
 	Project     *ProjectSearchResponse     `json:"project,omitempty"`
 	Group       *GroupSearchResponse       `json:"group,omitempty"`
 	Session     *SessionSearchResponse     `json:"session,omitempty"`
@@ -82,20 +94,43 @@ type SourceResponse struct {
 	Parent      *ParentSearchResponse      `json:"parent,omitempty"`
 }
 
+// Search runs a query, returning up to limit results.
+func (c *Client) Search(search_query *SearchQuery) ([]*SearchResponse, *http.Response, error) {
+	var aerr *Error
+	var response []*SearchResponse
+
+	if search_query.Limit == 0 {
+		search_query.Limit = 100
+	}
+
+	url := "dataexplorer/search?simple=true&size="
+
+	if search_query.Limit >= 0 {
+		url += strconv.Itoa(search_query.Limit)
+	} else {
+		url += "all"
+	}
+
+	resp, err := c.New().Post(url).BodyJSON(search_query).Receive(&response, &aerr)
+
+	return response, resp, Coalesce(err, aerr)
+}
+
 // SearchResponse is used for endpoints of data_explorer
-type SearchResponse struct {
+type RawSearchResponse struct {
 	Id     string          `json:"_id"`
-	Source *SourceResponse `json:"_source,omitempty"`
+	Source *SearchResponse `json:"_source,omitempty"`
 }
 
 // Because the endpoint returns a key results which is a list of responses
-type SearchResponseList struct {
-	Results []*SearchResponse `json:"results,omitempty"`
+type RawSearchResponseList struct {
+	Results []*RawSearchResponse `json:"results,omitempty"`
 }
 
-func (c *Client) Search(search_query *SearchQuery) (*SearchResponseList, *http.Response, error) {
+// SearchRaw is left in for compatibility reasons. You should probably use Search.
+func (c *Client) SearchRaw(search_query *SearchQuery) (*RawSearchResponseList, *http.Response, error) {
 	var aerr *Error
-	var response *SearchResponseList
+	var response *RawSearchResponseList
 
 	resp, err := c.New().Post("dataexplorer/search").BodyJSON(search_query).Receive(&response, &aerr)
 
