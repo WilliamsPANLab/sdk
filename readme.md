@@ -109,6 +109,8 @@ Propose batch job                                | X       |        |        |
 Start batch job                                  | X       | X      | X      | X
 Cancel batch job                                 | X       |        |        |
 &nbsp;                                           |         |        |        |
+Search                                           | X       | X      | X      | X
+&nbsp;                                           |         |        |        |
 Create bulk download ticket                      |         |        |        |
 Get bulk download from tricket                   |         |        |        |
 &nbsp;                                           |         |        |        |
@@ -143,9 +145,6 @@ List groups with projects the user can access    |         |        |        |
 Get schema                                       |         |        |        |
 Get job stats (redesign on the horizon)          |         |        |        |
 Get report                                       |         |        |        |
-Search?                                          |         |        |        |
-Search files?                                    |         |        |        |
-Search container?                                |         |        |        |
 Get all gear rules                               |         |        |        |
 Overwrite all gear rules                         |         |        |        |
 &nbsp;                                           |         |        |        |
