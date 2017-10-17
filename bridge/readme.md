@@ -4,7 +4,7 @@ This folder holds the tooling required to cross-compile the SDK into other langu
 
 ## Building the bridge
 
-From the current folder:
+From this `bridge` folder:
 
 ```
 ./make.sh
