@@ -119,10 +119,10 @@ jobs:
                   SdkTestKey:      "localhost:8080:insecure-key"
                   SdkTestProtocol: "http"
 
-            - run:
-                name: Triage environment
-                command: ./make.sh go run .circleci/triage-environment.go
-                when: on_fail
+            # - run:
+            #     name: Triage environment
+            #     command: ./make.sh go run .circleci/triage-environment.go
+            #     when: on_fail
 
             - run:
                 name: Build SDK
@@ -143,7 +143,7 @@ jobs:
             # CircleCI wants their 'store_test_results' path to be a folder; oblige them!
             - run:
                 name: Test fiddling
-                command: test -f .report.xml && ( cat .report.xml; mkdir -p circle-tests; mv .report.xml circle-tests/ ) || true
+                command: test -f .report.xml && ( mkdir -p circle-tests; mv .report.xml circle-tests/ ) || true
                 when: always
 
             - store_test_results:

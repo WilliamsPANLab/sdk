@@ -57,6 +57,11 @@ func (t *F) TestAnalyses() {
 	t.So(rAna.Files[0].Name, ShouldEqual, "yeats.txt")
 	t.So(rAna.Files[0].Input, ShouldBeTrue)
 
+	// Access analysis directly
+	rAna2, _, err := t.GetAnalysis(rAna.Id)
+	t.So(err, ShouldBeNil)
+	t.So(rAna2, ShouldEqual, rAna2)
+
 	// Run the job
 	_, err = t.ChangeJobState(rAna.Job.Id, api.Running)
 	t.So(err, ShouldBeNil)
