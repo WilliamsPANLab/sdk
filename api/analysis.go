@@ -54,6 +54,15 @@ type Analysis struct {
 	Permissions []*Permission `json:"permissions,omitempty"`
 }
 
+func (c *Client) GetAnalysis(id string) (*Analysis, *http.Response, error) {
+	var aerr *Error
+	var analysis *Analysis
+
+	// inflate_job flag is set to avoid a dynamic type on Analysis.Job
+	resp, err := c.New().Get("analyses/"+id+"?inflate_job=true").Receive(&analysis, &aerr)
+	return analysis, resp, Coalesce(err, aerr)
+}
+
 func (c *Client) AddSessionAnalysis(sessionId string, analysis *Analysis, job *Job) (string, *http.Response, error) {
 	var aerr *Error
 	var response *IdResponse

@@ -31,6 +31,11 @@ type Origin struct {
 	Method string `json:"method,omitempty"`
 	Name   string `json:"name,omitempty"`
 	Type   string `json:"type,omitempty"`
+
+	// Some origins may, in turn, hold an origin.
+	// The parent origin is considered to be more "canonical" than the one it contains.
+	// For example, one origin might be User A via Job B.
+	Via *Origin `json:"via,omitempty"`
 }
 
 type ContainerReference struct {

@@ -33,10 +33,6 @@ func main() {
 		Firstname: "Test", Lastname: "User",
 		Created: &now, Modified: &now,
 		RootAccess: &root,
-		ApiKey: &api.Key{
-			Key: "insecure-key",
-			Created: &now, LastUsed: &now,
-		},
 	}
 
 	Println("Inserting test user...")
@@ -54,6 +50,21 @@ func main() {
 	err = session.DB("scitran").C("users").Insert(encoded)
 	if err != nil { Fatalln("Inserting user failed:", err) }
 	Println("Test user inserted.")
+
+
+	Println("Inserting test api key...")
+
+	api_key := map[string]interface{}{
+		"_id": "insecure-key",
+		"created": &now,
+		"last_used": &now,
+		"uid": "a@b.c",
+		"type": "user",
+	}
+
+	err = session.DB("scitran").C("apikeys").Insert(api_key)
+	if err != nil { Fatalln("Inserting api key failed:", err) }
+	Println("Test api key inserted.")
 
 	var client *api.Client
 	var user *api.User
