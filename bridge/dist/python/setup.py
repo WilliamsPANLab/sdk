@@ -1,4 +1,5 @@
 import os
+import re
 
 from setuptools import setup, find_packages
 
@@ -9,9 +10,7 @@ install_requires = [
 setup(
     name = 'flywheel',
     
-    # Keep this in sync with /sdk.go !
-    version = '0.2.0',
-    
+    version = re.search('Version = "(.*)"', open('../../../sdk.go').read()).group(1),
     
     description = 'Flywheel Python SDK',
     author = 'Nathaniel Kofalt',
