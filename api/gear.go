@@ -27,6 +27,7 @@ type Gear struct {
 
 	Author     string `json:"author,omitempty"`
 	Maintainer string `json:"maintainer,omitempty"`
+	Cite       string `json:"cite,omitempty"`
 	License    string `json:"license,omitempty"`
 
 	Source string `json:"source"`
