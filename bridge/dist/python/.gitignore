@@ -1,1 +1,7 @@
 /flywheel.py
+/flywheel/flywheel.py
+/flywheel/*.h
+/flywheel/*.so
+/build/
+/flywheel.egg-info/
+/wheelhouse

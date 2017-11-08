@@ -22,7 +22,7 @@ else:
     _filename = 'flywheelBridge.so'    # Guess
 
 # Load the shared object file. Further details are added at the end of the file.
-bridge = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), '../c', _filename))
+bridge = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), _filename))
 
 def test_bridge(s):
     """

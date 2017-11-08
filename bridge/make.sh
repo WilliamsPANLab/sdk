@@ -39,6 +39,8 @@ else
 fi
 go build -buildmode=c-shared -o dist/c/flywheelBridge.$ext flywheel.io/sdk/bridge/dist
 
+cp dist/c/flywheelBridge.* dist/python/flywheel
+
 # Matlab wants a simpler copy of the header file
 cp dist/c/flywheelBridge.* dist/matlab/
 # Remove typedef and line precompiler directive, as they confuse matlab

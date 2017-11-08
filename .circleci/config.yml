@@ -8,7 +8,8 @@ jobs:
         working_directory: "/workspace/src/flywheel.io/sdk"
 
         docker:
-            - image: buildpack-deps:zesty
+            # - image: buildpack-deps:zesty
+            - image: flywheel/sdk-ci:sdk-ci-add-jq
               environment:
                 # Enable the installation and use of junit XML output
                 MakeGenerateJunit: "1"
@@ -125,15 +126,26 @@ jobs:
             #     when: on_fail
 
             - run:
-                name: Build SDK
+                name: Build Bridge
                 command: ./bridge/make.sh
+
             - run:
-                name: Test drive python frontend
-                command: python test-drive.py
-                working_directory: /workspace/src/flywheel.io/sdk/bridge/dist/python
+                name: Build Wheel
+                command: ./bridge/scripts/dist.sh
+
+            - run:
+                name: Test Wheel
+                command: ./bridge/scripts/test-wheel.sh
                 environment:
                   SdkTestKey: "localhost:8080:insecure-key,InsecureUsePlaintext"
                   PYTHONDONTWRITEBYTECODE: "really"
+
+            # - run:
+            #     name: Upload dist, if tagged
+            #     command: |
+            #       if [ "$CIRCLE_TAG" ]; then
+            #         ./bridge/scripts/upload-dist.sh "$GITHUB_AUTH_TOKEN" "$CIRCLE_TAG" "/workspace/src/flywheel.io/sdk/bridge/dist/python/wheelhouse";
+            #       fi
 
             - run:
                 name: Cleanup
@@ -151,12 +163,12 @@ jobs:
 
             - store_artifacts:
                 path: "/workspace/bin"
-                destination: build
+                destination: executable
 
             - store_artifacts:
                 path: "/workspace/src/flywheel.io/sdk/bridge/dist"
-                destination: bridge
+                destination: builds
 
             - store_artifacts:
                 path: "/workspace/src/flywheel.io/sdk/coverage.html"
-                destination: coverage
+                destination: coverage.html
