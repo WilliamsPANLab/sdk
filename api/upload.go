@@ -178,6 +178,7 @@ func (c *Client) Upload(url string, metadata []byte, progress chan<- int64, file
 	// Wait for both to complete, and report back
 	go func() {
 		wg.Wait()
+		response.Body.Close()
 
 		// Encoding & local-IO errors take precedence over network errors.
 		// Could combine the two if both are set. Eh.
