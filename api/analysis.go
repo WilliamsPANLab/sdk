@@ -102,3 +102,19 @@ func (c *Client) AddSessionAnalysisNote(sessionId string, analysisId string, tex
 
 	return resp, Coalesce(err, aerr)
 }
+
+func (c *Client) DownloadFromAnalysis(sessionId, analysisId, filename string, destination *DownloadSource) (chan int64, chan error) {
+	url := "sessions/" + sessionId + "/analyses/" + analysisId + "/files/" + filename
+	return c.DownloadSimple(url, destination)
+}
+
+// No progress reporting
+func (c *Client) DownloadFileFromAnalysis(sessionId, analysisId, filename, path string) error {
+	src := CreateDownloadSourceFromFilename(path)
+	progress, result := c.DownloadFromAnalysis(sessionId, analysisId, filename, src)
+
+	// drain and report
+	for range progress {
+	}
+	return <-result
+}
