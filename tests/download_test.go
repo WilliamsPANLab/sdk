@@ -29,7 +29,7 @@ func (t *F) TestBadDownloads() {
 
 	// Could improve this in the future
 	err := <-result
-	t.So(err.Error(), ShouldEqual, "{\"status_code\": 404, \"message\": \"The resource could not be found.\"}")
+	t.So(err.Error(), ShouldMatchRegex, "\\{\"status_code\": 404, \"message\": \"The resource could not be found.\"\\, \"request_id\": \"[^\"]+\"}")
 	t.So(buffer.String(), ShouldEqual, "")
 }
 

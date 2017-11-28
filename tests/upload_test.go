@@ -28,8 +28,10 @@ func (t *F) TestBadUploads() {
 	poem := "Are full of passionate intensity."
 	source = UploadSourceFromString("yeats.txt", poem)
 	_, result = t.UploadSimple("not-an-endpoint", nil, source)
+
 	// Could improve this in the future
-	t.So((<-result).Error(), ShouldEqual, "{\"status_code\": 404, \"message\": \"The resource could not be found.\"}")
+	err := <-result
+	t.So(err.Error(), ShouldMatchRegex, "\\{\"status_code\": 404, \"message\": \"The resource could not be found.\"\\, \"request_id\": \"[^\"]+\"}")
 }
 
 // Given an upload function, container ID, filename, and content - upload & check length

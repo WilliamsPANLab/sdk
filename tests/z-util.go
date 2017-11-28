@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"math/rand"
+	"regexp"
 	"strings"
 	"time"
 
@@ -80,6 +81,35 @@ func ShouldBeSameTimeAs(actual interface{}, expected ...interface{}) string {
 		return fmt.Sprintf(shouldBeTimeEqual, actualTime, expectedTime, actualTime.Sub(expectedTime))
 	}
 
+	return success
+}
+
+// Helper function to compare a string against a regular expression
+const (
+	invalidRegex     = "Invalid match expression '%s': %s"
+	regexBadMatch    = "Expected '%s' to match pattern: '%s'"
+	shouldUseStrings = "You must provide string instances as arguments to this assertion."
+)
+
+func ShouldMatchRegex(actual interface{}, pattern ...interface{}) string {
+	if fail := need(1, pattern); fail != success {
+		return fail
+	}
+
+	actualString, firstOk := actual.(string)
+	patternString, secondOk := pattern[0].(string)
+
+	if !firstOk || !secondOk {
+		return shouldUseStrings
+	}
+
+	matched, err := regexp.MatchString(patternString, actualString)
+	if err != nil {
+		return fmt.Sprintf(invalidRegex, patternString, err.Error())
+	}
+	if !matched {
+		return fmt.Sprintf(regexBadMatch, actualString, patternString)
+	}
 	return success
 }
 
