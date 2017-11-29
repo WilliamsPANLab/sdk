@@ -2,7 +2,6 @@ package api
 
 import (
 	"io"
-	"net/http"
 
 	"github.com/dghubble/sling"
 )
@@ -13,7 +12,7 @@ const SdkDebugKey = "SdkDebug"
 
 // Client is an http and sling client capable of making flywheel requests.
 type Client struct {
-	*http.Client
+	sling.Doer
 	*sling.Sling
 }
 

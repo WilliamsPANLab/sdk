@@ -122,7 +122,7 @@ func (c *Client) sendUploadRequest(url string, reader io.ReadCloser, contentType
 		return nil, err
 	}
 
-	resp, err := c.Client.Do(req)
+	resp, err := c.Doer.Do(req)
 	if err != nil {
 		return resp, err
 	}

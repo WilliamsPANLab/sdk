@@ -42,7 +42,7 @@ func (c *Client) Download(url string, progress chan<- int64, destination *Downlo
 			return err
 		}
 
-		resp, err := c.Client.Do(req)
+		resp, err := c.Doer.Do(req)
 		if err != nil {
 			return err
 		}
@@ -62,7 +62,14 @@ func (c *Client) Download(url string, progress chan<- int64, destination *Downlo
 		defer progressReader.Close()
 
 		// Copy response
-		_, err = io.Copy(destination.Writer, progressReader)
+		var written int64
+		written, err = io.Copy(destination.Writer, progressReader)
+
+		// Verify that the written length was what was expected
+		if resp.ContentLength != written {
+			return errors.New("Response body was truncated")
+		}
+
 		return err
 	}
 

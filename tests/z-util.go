@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"math/rand"
+	"net/http"
 	"regexp"
 	"strings"
 	"time"
@@ -117,6 +118,34 @@ func UploadSourceFromString(name, src string) *api.UploadSource {
 	return &api.UploadSource{
 		Reader: ioutil.NopCloser(bytes.NewBufferString(src)),
 		Name:   name,
+	}
+}
+
+type doFunc func(*http.Request) (*http.Response, error)
+type httpResponseWrapperFunc func(*http.Response, error) (*http.Response, error)
+
+func (f doFunc) Do(req *http.Request) (*http.Response, error) {
+	return f(req)
+}
+
+func HttpResponseWrapper(client *api.Client, fn httpResponseWrapperFunc) *api.Client {
+	doer := doFunc(func(req *http.Request) (*http.Response, error) {
+		resp, err := client.Doer.Do(req)
+		return fn(resp, err)
+	})
+
+	return &api.Client{
+		doer,
+		client.Sling.New().Doer(doer),
+	}
+}
+
+func HttpResponseLengthSetter(len int64) httpResponseWrapperFunc {
+	return func(resp *http.Response, err error) (*http.Response, error) {
+		if resp != nil {
+			resp.ContentLength = len
+		}
+		return resp, err
 	}
 }
 
