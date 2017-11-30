@@ -44,6 +44,7 @@ func (t *F) TestTruncatedDownloads() {
 
 	// Wrap the response handler
 	client := HttpResponseWrapper(t.Client, HttpResponseLengthSetter(100))
+	// Ignoring the progress channel result because a mismatch is expected
 	_, result := client.DownloadFromProject(projectId, "yeats.txt", dest)
 
 	err := <-result

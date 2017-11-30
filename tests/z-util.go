@@ -121,13 +121,17 @@ func UploadSourceFromString(name, src string) *api.UploadSource {
 	}
 }
 
+// Implement the sling.Doer interface as a function wrapper
 type doFunc func(*http.Request) (*http.Response, error)
-type httpResponseWrapperFunc func(*http.Response, error) (*http.Response, error)
 
 func (f doFunc) Do(req *http.Request) (*http.Response, error) {
 	return f(req)
 }
 
+type httpResponseWrapperFunc func(*http.Response, error) (*http.Response, error)
+
+// HttpResponseWrapper creates a new api.Client instance that will call the httpResponseWrapperFunc fn
+// after each request. This permits manipulation of the http.Response in some way for the purpose of unit testing.
 func HttpResponseWrapper(client *api.Client, fn httpResponseWrapperFunc) *api.Client {
 	doer := doFunc(func(req *http.Request) (*http.Response, error) {
 		resp, err := client.Doer.Do(req)
@@ -140,6 +144,8 @@ func HttpResponseWrapper(client *api.Client, fn httpResponseWrapperFunc) *api.Cl
 	}
 }
 
+// HttpResponseLengthSetter is an httpResponseWrapperFunc that will set the ContentLength of the http.Response
+// to len after making the request.
 func HttpResponseLengthSetter(len int64) httpResponseWrapperFunc {
 	return func(resp *http.Response, err error) (*http.Response, error) {
 		if resp != nil {
