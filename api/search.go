@@ -13,6 +13,7 @@ const (
 	AcquisitionString SearchType = "acquisition"
 	SessionString     SearchType = "session"
 	AnalysisString    SearchType = "analysis"
+	CollectionString  SearchType = "collection"
 )
 
 type SearchQuery struct {
@@ -80,6 +81,11 @@ type ParentSearchResponse struct {
 	Type string `json:"type,omitempty"`
 	Id   string `json:"_id,omitempty"`
 }
+type CollectionSearchResponse struct {
+	Name    string `json:"label,omitempty"`
+	Curator string `json:"curator,omitempty"`
+	Created string `json:"created,omitempty"`
+}
 
 // SearchResponse for the SearchResponse
 type SearchResponse struct {
@@ -89,6 +95,7 @@ type SearchResponse struct {
 	Acquisition *AcquisitionSearchResponse `json:"acquisition,omitempty"`
 	Subject     *SubjectSearchResponse     `json:"subject,omitempty"`
 	File        *FileSearchResponse        `json:"file,omitempty"`
+	Collection  *CollectionSearchResponse  `json:"collection,omitempty"`
 	Permissions []*Permission              `json:"permissions,omitempty"`
 	Analysis    *AnalysisSearchResponse    `json:"analysis,omitempty"`
 	Parent      *ParentSearchResponse      `json:"parent,omitempty"`
