@@ -33,6 +33,26 @@ func (t *F) TestBadDownloads() {
 	t.So(buffer.String(), ShouldEqual, "")
 }
 
+func (t *F) TestTruncatedDownloads() {
+	// Create test project, and upload text
+	_, projectId := t.createTestProject()
+
+	poem := "Surely some revelation is at hand;"
+	t.uploadText(t.UploadToProject, projectId, "yeats.txt", poem)
+
+	buffer, dest := DownloadSourceToBuffer()
+
+	// Wrap the response handler
+	client := HttpResponseWrapper(t.Client, HttpResponseLengthSetter(100))
+	// Ignoring the progress channel result because a mismatch is expected
+	_, result := client.DownloadFromProject(projectId, "yeats.txt", dest)
+
+	err := <-result
+	t.So(err, ShouldNotBeNil)
+	t.So(err.Error(), ShouldEqual, "Response body was truncated")
+	t.So(buffer.String(), ShouldEqual, poem)
+}
+
 // Given an download function, container ID, filename, and content - download & check content
 func (t *F) downloadText(fn func(string, string, *api.DownloadSource) (chan int64, chan error), id, filename, text string) {
 	buffer, dest := DownloadSourceToBuffer()
