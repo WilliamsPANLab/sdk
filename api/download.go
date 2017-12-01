@@ -27,10 +27,12 @@ func (c *Client) Download(url string, progress chan<- int64, destination *Downlo
 		// Open the writer based on destination path, if no writer was given.
 		if destination.Writer == nil {
 			if destination.Path == "" {
+				close(progress)
 				return errors.New("Neither destination path nor writer was set in download source")
 			}
 			fileWriter, err := os.Create(destination.Path)
 			if err != nil {
+				close(progress)
 				return err
 			}
 			destination.Writer = fileWriter
@@ -39,21 +41,25 @@ func (c *Client) Download(url string, progress chan<- int64, destination *Downlo
 
 		req, err := c.New().Get(url).Request()
 		if err != nil {
+			close(progress)
 			return err
 		}
 
 		resp, err := c.Doer.Do(req)
 		if err != nil {
+			close(progress)
 			return err
 		}
 
 		if resp.StatusCode != 200 {
 			// Needs robust handling for body & raw nils
 			raw, _ := ioutil.ReadAll(resp.Body)
+			close(progress)
 			return errors.New(string(raw))
 		}
 
 		if resp.Body == nil {
+			close(progress)
 			return errors.New("Response body was empty")
 		}
 

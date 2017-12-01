@@ -15,17 +15,20 @@ func (t *F) TestCreateDownloadSourceFromFilenames() {
 func (t *F) TestBadDownloads() {
 	// Invalid download source
 	source := &api.DownloadSource{}
-	_, result := t.DownloadSimple("", source)
+	progress, result := t.DownloadSimple("", source)
+	t.So(<-progress, ShouldEqual, 0)
 	t.So((<-result).Error(), ShouldEqual, "Neither destination path nor writer was set in download source")
 
 	// Nonexistant download path
 	source = &api.DownloadSource{Path: "/dev/null/does-not-exist"}
-	_, result = t.DownloadSimple("", source)
+	progress, result = t.DownloadSimple("", source)
+	t.So(<-progress, ShouldEqual, 0)
 	t.So((<-result).Error(), ShouldStartWith, "open /dev/null/does-not-exist: ")
 
 	// Bad download url
 	buffer, source := DownloadSourceToBuffer()
-	_, result = t.DownloadSimple("not-an-endpoint", source)
+	progress, result = t.DownloadSimple("not-an-endpoint", source)
+	t.So(<-progress, ShouldEqual, 0)
 
 	// Could improve this in the future
 	err := <-result
