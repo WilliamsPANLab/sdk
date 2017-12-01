@@ -123,6 +123,9 @@ func (t *F) TestSessionFiles() {
 	// Download the same file and check content
 	t.downloadText(t.DownloadFromSession, sessionId, "yeats.txt", poem)
 
+	// Test unauthorized download with ticket for the file
+	t.downloadTextWithTicket(t.GetSessionDownloadUrl, sessionId, "yeats.txt", poem)
+
 	// Bundling: test file attributes
 	t.So(rSession.Files[0].Modality, ShouldEqual, "")
 	t.So(rSession.Files[0].Measurements, ShouldHaveLength, 0)

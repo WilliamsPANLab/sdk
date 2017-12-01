@@ -178,6 +178,10 @@ func (c *Client) DownloadFromSession(id string, filename string, destination *Do
 	return c.DownloadSimple(url, destination)
 }
 
+func (c *Client) GetSessionDownloadUrl(id string, filename string) (string, *http.Response, error) {
+	return c.GetTicketDownloadUrl("sessions", id, filename)
+}
+
 // No progress reporting
 func (c *Client) UploadFileToSession(id string, path string) error {
 	src := CreateUploadSourceFromFilenames(path)

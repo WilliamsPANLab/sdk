@@ -155,6 +155,10 @@ func (c *Client) DownloadFromAcquisition(id string, filename string, destination
 	return c.DownloadSimple(url, destination)
 }
 
+func (c *Client) GetAcquisitionDownloadUrl(id string, filename string) (string, *http.Response, error) {
+	return c.GetTicketDownloadUrl("acquisitions", id, filename)
+}
+
 // No progress reporting
 func (c *Client) UploadFileToAcquisition(id string, path string) error {
 	src := CreateUploadSourceFromFilenames(path)

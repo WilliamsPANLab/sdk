@@ -109,6 +109,9 @@ func (t *F) TestProjectFiles() {
 	// Download the same file and check content
 	t.downloadText(t.DownloadFromProject, projectId, "yeats.txt", poem)
 
+	// Test unauthorized download with ticket for the file
+	t.downloadTextWithTicket(t.GetProjectDownloadUrl, projectId, "yeats.txt", poem)
+
 	// Bundling: test file attributes
 	t.So(rProject.Files[0].Modality, ShouldEqual, "")
 	t.So(rProject.Files[0].Measurements, ShouldHaveLength, 0)

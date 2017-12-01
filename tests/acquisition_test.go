@@ -101,6 +101,9 @@ func (t *F) TestAcquisitionFiles() {
 	// Download the same file and check content
 	t.downloadText(t.DownloadFromAcquisition, acquisitionId, "yeats.txt", poem)
 
+	// Test unauthorized download with ticket for the file
+	t.downloadTextWithTicket(t.GetAcquisitionDownloadUrl, acquisitionId, "yeats.txt", poem)
+
 	// Bundling: test file attributes
 	t.So(rAcquisition.Files[0].Modality, ShouldEqual, "")
 	t.So(rAcquisition.Files[0].Measurements, ShouldHaveLength, 0)
