@@ -82,6 +82,7 @@ type ParentSearchResponse struct {
 	Id   string `json:"_id,omitempty"`
 }
 type CollectionSearchResponse struct {
+	Id      string `json:"_id,omitempty"`
 	Name    string `json:"label,omitempty"`
 	Curator string `json:"curator,omitempty"`
 	Created string `json:"created,omitempty"`
