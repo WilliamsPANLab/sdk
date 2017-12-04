@@ -24,16 +24,20 @@ func (c *Client) Download(url string, progress chan<- int64, destination *Downlo
 
 	// Synchronous closure
 	doDownload := func() error {
+		// Close the progress channel, and return err
+		closeAndErr := func(err error) error {
+			close(progress)
+			return err
+		}
+
 		// Open the writer based on destination path, if no writer was given.
 		if destination.Writer == nil {
 			if destination.Path == "" {
-				close(progress)
-				return errors.New("Neither destination path nor writer was set in download source")
+				return closeAndErr(errors.New("Neither destination path nor writer was set in download source"))
 			}
 			fileWriter, err := os.Create(destination.Path)
 			if err != nil {
-				close(progress)
-				return err
+				return closeAndErr(err)
 			}
 			destination.Writer = fileWriter
 		}
@@ -41,26 +45,22 @@ func (c *Client) Download(url string, progress chan<- int64, destination *Downlo
 
 		req, err := c.New().Get(url).Request()
 		if err != nil {
-			close(progress)
-			return err
+			return closeAndErr(err)
 		}
 
 		resp, err := c.Doer.Do(req)
 		if err != nil {
-			close(progress)
-			return err
+			return closeAndErr(err)
 		}
 
 		if resp.StatusCode != 200 {
 			// Needs robust handling for body & raw nils
 			raw, _ := ioutil.ReadAll(resp.Body)
-			close(progress)
-			return errors.New(string(raw))
+			return closeAndErr(errors.New(string(raw)))
 		}
 
 		if resp.Body == nil {
-			close(progress)
-			return errors.New("Response body was empty")
+			return closeAndErr(errors.New("Response body was empty"))
 		}
 
 		// Pass response body through a ProgressReader which will report to the progress chan
