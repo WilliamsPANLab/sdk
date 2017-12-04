@@ -83,8 +83,8 @@ func (t *F) downloadTextWithTicket(fn func(string, string) (string, *http.Respon
 	t.So(downloadUrl, ShouldNotEqual, "")
 
 	noAuthClient := api.Client{
-		t.Doer,
-		t.Sling.New().Set("Authorization", ""),
+		Doer:  t.Doer,
+		Sling: t.Sling.New().Set("Authorization", ""),
 	}
 
 	progress, resultChan := noAuthClient.DownloadSimple(downloadUrl, dest)

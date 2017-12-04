@@ -17,7 +17,7 @@ type DownloadSource struct {
 	Path   string
 }
 
-// DownloadTicket is retrieved when a keyless download is required
+// DownloadTicket is retrieved when generating a download URL that does not require authentication
 type DownloadTicket struct {
 	Ticket string `json:"ticket,omitempty"`
 }

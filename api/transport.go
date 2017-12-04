@@ -69,8 +69,8 @@ func NewApiKeyClient(apiKey string, options ...ApiKeyClientOption) *Client {
 		Client(hc)
 
 	return &Client{
-		hc,
-		sc,
+		Doer:  hc,
+		Sling: sc,
 	}
 }
 
