@@ -109,5 +109,8 @@ func (c *Client) GetTicketDownloadUrl(container string, id string, filename stri
 		return "", resp, cerr
 	}
 
-	return downloadUrl + ticket.Ticket, resp, cerr
+	// NOTE: downloadUrl is relative, so take the URL from the
+	// original request object to get the absolute path.
+	// AFAIK we don't have a good way to retrieve the base URL back from Sling
+	return resp.Request.URL.String() + ticket.Ticket, resp, cerr
 }
