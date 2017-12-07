@@ -125,6 +125,9 @@ func (t *F) TestCollectionFiles() {
 	// Download the same file and check content
 	t.downloadText(t.DownloadFromCollection, collectionId, "yeats.txt", poem)
 
+	// Test unauthorized download with ticket for the file
+	t.downloadTextWithTicket(t.GetCollectionDownloadUrl, collectionId, "yeats.txt", poem)
+
 	// Bundling: test file attributes
 	t.So(rCollection.Files[0].Modality, ShouldEqual, "")
 	t.So(rCollection.Files[0].Measurements, ShouldHaveLength, 0)

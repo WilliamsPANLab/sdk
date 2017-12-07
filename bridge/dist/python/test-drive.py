@@ -98,6 +98,9 @@ assert project['notes'][0]['text'] == 'This is a note'
 assert project['files'][0]['name'] == filename
 assert project['files'][0]['size'] == os.path.getsize('/tmp/download.py')
 
+projectDownloadUrl = fw.get_project_download_url(projectId, filename)
+assert projectDownloadUrl != ''
+
 
 #
 ## Sessions
@@ -126,6 +129,9 @@ assert session['label'] == 'testdrive'
 assert session['notes'][0]['text'] == 'This is a note'
 assert session['files'][0]['name'] == filename
 assert session['files'][0]['size'] == os.path.getsize('/tmp/download2.py')
+
+sessionDownloadUrl = fw.get_session_download_url(sessionId, filename)
+assert sessionDownloadUrl != ''
 
 
 #
@@ -156,6 +162,9 @@ assert acq['notes'][0]['text'] == 'This is a note'
 assert acq['files'][0]['name'] == filename
 assert acq['files'][0]['size'] == os.path.getsize('/tmp/download3.py')
 
+acqDownloadUrl = fw.get_acquisition_download_url(acqId, filename)
+assert acqDownloadUrl != ''
+
 
 #
 ## Collections
@@ -183,6 +192,9 @@ collection = fw.get_collection(colId)
 assert collection['notes'][0]['text'] == 'This is a note'
 assert acq['files'][0]['name'] == filename
 assert acq['files'][0]['size'] == os.path.getsize('/tmp/download4.py')
+
+colDownloadUrl = fw.get_collection_download_url(colId, filename)
+assert colDownloadUrl != ''
 
 
 #

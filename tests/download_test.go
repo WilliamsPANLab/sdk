@@ -4,6 +4,7 @@ import (
 	. "github.com/smartystreets/assertions"
 
 	"flywheel.io/sdk/api"
+	"net/http"
 )
 
 func (t *F) TestCreateDownloadSourceFromFilenames() {
@@ -36,6 +37,15 @@ func (t *F) TestBadDownloads() {
 	t.So(buffer.String(), ShouldEqual, "")
 }
 
+func (t *F) TestBadUrlDownload() {
+	// Try with invalid project
+	url, _, err := t.GetProjectDownloadUrl("not-a-project", "not-a-file")
+
+	t.So(url, ShouldEqual, "")
+	t.So(err, ShouldNotBeNil)
+	t.So(err.Error(), ShouldEqual, "(404) The resource could not be found.")
+}
+
 func (t *F) TestTruncatedDownloads() {
 	// Create test project, and upload text
 	_, projectId := t.createTestProject()
@@ -60,6 +70,27 @@ func (t *F) TestTruncatedDownloads() {
 func (t *F) downloadText(fn func(string, string, *api.DownloadSource) (chan int64, chan error), id, filename, text string) {
 	buffer, dest := DownloadSourceToBuffer()
 	progress, resultChan := fn(id, filename, dest)
+
+	// Last update should be the full string length.
+	t.checkProgressChanEndsWith(progress, int64(len(text)))
+	t.So(<-resultChan, ShouldBeNil)
+	t.So(buffer.String(), ShouldEqual, text)
+}
+
+// Given a download function, container ID, filename, and content - generate a download ticket, download without authorization, and check content
+func (t *F) downloadTextWithTicket(fn func(string, string) (string, *http.Response, error), id, filename, text string) {
+	buffer, dest := DownloadSourceToBuffer()
+	downloadUrl, _, err := fn(id, filename)
+
+	t.So(err, ShouldBeNil)
+	t.So(downloadUrl, ShouldNotEqual, "")
+
+	noAuthClient := api.Client{
+		Doer:  t.Doer,
+		Sling: t.Sling.New().Set("Authorization", ""),
+	}
+
+	progress, resultChan := noAuthClient.DownloadSimple(downloadUrl, dest)
 
 	// Last update should be the full string length.
 	t.checkProgressChanEndsWith(progress, int64(len(text)))

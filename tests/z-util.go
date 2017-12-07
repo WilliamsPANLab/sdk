@@ -139,8 +139,8 @@ func HttpResponseWrapper(client *api.Client, fn httpResponseWrapperFunc) *api.Cl
 	})
 
 	return &api.Client{
-		doer,
-		client.Sling.New().Doer(doer),
+		Doer:  doer,
+		Sling: client.Sling.New().Doer(doer),
 	}
 }
 

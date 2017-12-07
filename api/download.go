@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"os"
 )
 
@@ -14,6 +15,11 @@ import (
 type DownloadSource struct {
 	Writer io.WriteCloser
 	Path   string
+}
+
+// DownloadTicket is retrieved when generating a download URL that does not require authentication
+type DownloadTicket struct {
+	Ticket string `json:"ticket,omitempty"`
 }
 
 func CreateDownloadSourceFromFilename(filename string) *DownloadSource {
@@ -95,4 +101,22 @@ func (c *Client) DownloadSimple(url string, destination *DownloadSource) (chan i
 	progress := make(chan int64, 10)
 
 	return progress, c.Download(url, progress, destination)
+}
+
+// GetTicketDownloadURL will generate a ticket for downloading a file outside of the SDK
+func (c *Client) GetTicketDownloadUrl(container string, id string, filename string) (string, *http.Response, error) {
+	var aerr *Error
+	var ticket *DownloadTicket
+	downloadUrl := container + "/" + id + "/files/" + filename + "?ticket="
+	resp, err := c.New().Get(downloadUrl).Receive(&ticket, &aerr)
+
+	cerr := Coalesce(err, aerr)
+	if cerr != nil {
+		return "", resp, cerr
+	}
+
+	// NOTE: downloadUrl is relative, so take the URL from the
+	// original request object to get the absolute path.
+	// AFAIK we don't have a good way to retrieve the base URL back from Sling
+	return resp.Request.URL.String() + ticket.Ticket, resp, cerr
 }

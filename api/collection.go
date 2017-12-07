@@ -201,6 +201,10 @@ func (c *Client) DownloadFromCollection(id string, filename string, destination 
 	return c.DownloadSimple(url, destination)
 }
 
+func (c *Client) GetCollectionDownloadUrl(id string, filename string) (string, *http.Response, error) {
+	return c.GetTicketDownloadUrl("collections", id, filename)
+}
+
 // No progress reporting
 func (c *Client) UploadFileToCollection(id string, path string) error {
 	src := CreateUploadSourceFromFilenames(path)

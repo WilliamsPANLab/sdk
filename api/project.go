@@ -160,6 +160,10 @@ func (c *Client) DownloadFromProject(id string, filename string, destination *Do
 	return c.DownloadSimple(url, destination)
 }
 
+func (c *Client) GetProjectDownloadUrl(id string, filename string) (string, *http.Response, error) {
+	return c.GetTicketDownloadUrl("projects", id, filename)
+}
+
 // No progress reporting
 func (c *Client) UploadFileToProject(id string, path string) error {
 	src := CreateUploadSourceFromFilenames(path)
