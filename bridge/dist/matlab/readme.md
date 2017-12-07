@@ -8,15 +8,17 @@ Use the Flywheel Matlab SDK to do the following:
 * create tags and notes for groups, projects, sessions, and acquisitions
 
 ### Requirements
-Requires [JSONLab](https://www.mathworks.com/matlabcentral/fileexchange/33381-jsonlab--a-toolbox-to-encode-decode-json-files) Matlab package.
+Requires [JSONio](https://github.com/gllmflndn/JSONio) Matlab package.
 
-NOTE: The `ParseLogical` option for the `savejson` function is set to 1. This causes any logical `1` or `0` to be set to `true` or `false`, respectively, when written to a JSON string. This is needed for the search queries within the SDK. If a 1 or 0 is needed to be written out to JSON, ensure that it is a `1` or `0` of class `double` as opposed to the `logical` class. 
+### Convention Note
+Due to Matlab restrictions, structure member names cannot begin with an underscore. 
+Therefore the `_id` field is mapped to `id` automatically by the SDK.
 
 ### Example Usage
-Before starting, add JSONLab and Flywheel Matlab SDK to project path.
+Before starting, add JSONio and Flywheel Matlab SDK to project path.
 
 ```matlab
-addpath('/path/to/JSONlab/');
+addpath('/path/to/JSONio/');
 addpath('/path/to/FlywheelSDK');
 ```
 
