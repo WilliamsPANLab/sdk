@@ -54,6 +54,23 @@ type Analysis struct {
 	Permissions []*Permission `json:"permissions,omitempty"`
 }
 
+// This may be cleaner if we had an abstract container struct
+func (c *Client) GetAnalyses(cont_name string, cid string, sub_cont string) ([]*Analysis, *http.Response, error) {
+	var aerr *Error
+	var analyses []*Analysis
+	var url string
+
+	// Check to see if sub_cont is an empty string
+	if sub_cont == "" {
+		url = cont_name + "/" + cid + "/analyses"
+	} else {
+		url = cont_name + "/" + cid + "/" + sub_cont + "/analyses"
+	}
+
+	resp, err := c.New().Get(url).Receive(&analyses, &aerr)
+	return analyses, resp, Coalesce(err, aerr)
+}
+
 func (c *Client) GetAnalysis(id string) (*Analysis, *http.Response, error) {
 	var aerr *Error
 	var analysis *Analysis
