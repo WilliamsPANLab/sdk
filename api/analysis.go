@@ -54,10 +54,33 @@ type Analysis struct {
 	Permissions []*Permission `json:"permissions,omitempty"`
 }
 
+type AnalysisListItem struct {
+	Id     string              `json:"_id,omitempty"`
+	Name   string              `json:"label,omitempty"`
+	Parent *ContainerReference `json:"parent,omitempty"`
+
+	Description string `json:"description,omitempty"`
+
+	// Treat this as a origin of { 'type': 'user', 'id': 'this-field' }
+	User string `json:"user,omitempty"`
+
+	Notes []*Note `json:"notes,omitempty"`
+
+	Created  *time.Time `json:"created,omitempty"`
+	Modified *time.Time `json:"modified,omitempty"`
+
+	Files []*AnalysisFile `json:"files,omitempty"`
+
+	Public      bool          `json:"public,omitempty"`
+	Permissions []*Permission `json:"permissions,omitempty"`
+
+	JobId string `json:"job,omitempty"`
+}
+
 // This may be cleaner if we had an abstract container struct
-func (c *Client) GetAnalyses(cont_name string, cid string, sub_cont string) ([]*Analysis, *http.Response, error) {
+func (c *Client) GetAnalyses(cont_name string, cid string, sub_cont string) ([]*AnalysisListItem, *http.Response, error) {
 	var aerr *Error
-	var analyses []*Analysis
+	var analyses []*AnalysisListItem
 	var url string
 
 	// Check to see if sub_cont is an empty string
