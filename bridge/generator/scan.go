@@ -217,6 +217,7 @@ func GetRelevantFunctionSignatures(path string) (*token.FileSet, []*ast.FuncDecl
 			"DownloadFromSession",
 			"DownloadFromAcquisition",
 			"DownloadFromCollection",
+			"DownloadFromAnalysis",
 
 			// Two complex data types in one signature
 			"AddSessionAnalysis",
