@@ -66,7 +66,7 @@ func TestSuite(t *testing.T) {
 	//
 	// In an attempt to combat this, let's query to the API once, ignoring results and any errors.
 	// Hopefully, this moves timing to the suite and out of the individual tests.
-	workAroundClient := makeClient()
+	workAroundClient := makeClient(false)
 	// begin := time.Now()
 	workAroundClient.GetCurrentUser()
 	// duration := time.Since(begin)
@@ -80,6 +80,8 @@ type F struct {
 	*gunit.Fixture
 
 	*api.Client
+
+	RootClient *api.Client
 }
 
 const (
@@ -103,7 +105,7 @@ const (
 )
 
 // makeClient reads settings from the environment and returns the corresponding client
-func makeClient() *api.Client {
+func makeClient(root bool) *api.Client {
 	mode, modeSet := os.LookupEnv(SdkTestMode)
 
 	if !modeSet {
@@ -127,14 +129,19 @@ func makeClient() *api.Client {
 			protocol = DefaultProtocol
 		}
 
-		if protocol == "https" {
-			client = api.NewApiKeyClient(key, api.InsecureNoSSLVerification)
-		} else if protocol == "http" {
-			client = api.NewApiKeyClient(key, api.InsecureNoSSLVerification, api.InsecureUsePlaintext)
-		} else {
+		opts := []api.ApiKeyClientOption{api.InsecureNoSSLVerification}
+
+		if protocol == "http" {
+			opts = append(opts, api.InsecureUsePlaintext)
+		} else if protocol != "https" {
 			panic("Protocol must be http or https, was " + protocol)
 		}
 
+		if root {
+			opts = append(opts, api.EnableRoot)
+		}
+
+		client = api.NewApiKeyClient(key, opts...)
 	} else {
 		panic("Unsupported test mode " + mode)
 	}
@@ -145,6 +152,7 @@ func makeClient() *api.Client {
 // Re-use state: clients are safe for concurrent use and are stateless.
 var once sync.Once
 var client *api.Client
+var rootClient *api.Client
 
 // Setup prepares the fixture with SDK client state. Runs once per test.
 func (t *F) Setup() {
@@ -156,10 +164,12 @@ func (t *F) Setup() {
 	t.AddFatalAssertion(ShouldHaveLength)
 
 	once.Do(func() {
-		client = makeClient()
+		client = makeClient(false)
+		rootClient = makeClient(true)
 	})
 
 	t.Client = client
+	t.RootClient = rootClient
 }
 
 /*

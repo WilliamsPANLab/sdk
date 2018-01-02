@@ -3,12 +3,14 @@ classdef Flywheel
     % Flywheel class enables user to communicate with Flywheel platform
     properties
         key     % key - API Key assigned through the Flywheel UI
+        root    % root - Whether or not this client is in management mode
     end
     methods
-        function obj = Flywheel(apiKey)
+        function obj = Flywheel(apiKey, root)
             % Usage Flywheel(apiKey)
             %  apiKey - API Key assigned for each user through the Flywheel UI
             %          apiKey must be in format <domain>:<API token>
+            %  root - Set to 'true' to indicate that the client should run in manage mode
             C = strsplit(apiKey, ':');
             % Check if key is valid
             if length(C) < 2
@@ -16,6 +18,14 @@ classdef Flywheel
                 throw(ME)
             end
             obj.key = apiKey;
+
+            % Set root mode
+            if exist('root', 'var') && root
+                obj.root = 1;
+            else
+                obj.root = 0;
+            end
+
             % Check if JSONio is in path
             if ~exist('jsonread')
                 ME = MException('FlywheelException:JSONio', 'JSONio function jsonread is not loaded. Please install JSONio and add to path.')
@@ -64,7 +74,7 @@ classdef Flywheel
             opts = struct('replacementStyle','hex');
             {{.ParamDataName}} = jsonwrite({{.ParamDataName}},opts);
             {{end -}}
-            pointer = calllib('flywheelBridge','{{.Name}}',obj.key,{{range .Params}}{{.Name}},{{end -}} statusPtr);
+            pointer = calllib('flywheelBridge','{{.Name}}',obj.key,obj.root,{{range .Params}}{{.Name}},{{end -}} statusPtr);
             result = Flywheel.handleJson(statusPtr,pointer);
         end
         {{end}}

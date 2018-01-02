@@ -39,10 +39,11 @@ class FlywheelException(Exception):
 
 class Flywheel:
 
-    def __init__(self, key):
+    def __init__(self, key, root=False):
         if len(key.split(':')) < 2:
             raise FlywheelException('Invalid API key.')
         self.key = six.b(key)
+        self.root = 1 if root else 0
 
     @staticmethod
     def _handle_return(status, pointer):
@@ -89,7 +90,7 @@ class Flywheel:
         status = ctypes.c_int(-100)
         {{if ne .ParamDataName ""}}{{.ParamDataName}} = json.dumps({{.ParamDataName}})
         {{end -}}
-        pointer = bridge.{{.Name}}(self.key, {{range .Params}}six.b(str({{.Name}})), {{end -}} ctypes.byref(status))
+        pointer = bridge.{{.Name}}(self.key, self.root, {{range .Params}}six.b(str({{.Name}})), {{end -}} ctypes.byref(status))
         return self._handle_return(status, pointer)
     {{end}}
 

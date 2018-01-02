@@ -24,6 +24,9 @@ type ApiKeyClientOptions struct {
 	// Use plaintext (HTTP) transport
 	InsecureUsePlaintext bool
 
+	// Enable root (Manage Site) mode
+	EnableRoot bool
+
 	// A writer to send debug request bodies to, if any
 	DebugWriter io.Writer
 }
@@ -31,6 +34,7 @@ type ApiKeyClientOptions struct {
 var DefaultApiKeyClientOptions = ApiKeyClientOptions{
 	InsecureSkipVerify:   false,
 	InsecureUsePlaintext: false,
+	EnableRoot:           false,
 }
 
 // Specify that the ApiKeyClient should not verify SSL connections.
@@ -40,6 +44,9 @@ var InsecureNoSSLVerification ApiKeyClientOption
 // Specify that the ApiKeyClient should use a plaintext HTTP transport.
 // Should only be used for development.
 var InsecureUsePlaintext ApiKeyClientOption
+
+// Specify that the ApiKeyClient should operate in Root (Manage Site) mode.
+var EnableRoot ApiKeyClientOption
 
 // Specify that the ApiKeyClient should log all request bodies to the specified Writer.
 // See DebugTransport for details.
@@ -56,5 +63,9 @@ func init() {
 
 	InsecureUsePlaintext = func(o *ApiKeyClientOptions) {
 		o.InsecureUsePlaintext = true
+	}
+
+	EnableRoot = func(o *ApiKeyClientOptions) {
+		o.EnableRoot = true
 	}
 }

@@ -15,7 +15,7 @@ int double_me3(int x) {
 
 {{range .Signatures}}
 // [[Rcpp::export]]
-char* fw_{{.Name}}(char* apiKey{{range .Params}}, {{.CType}} {{.Name}}{{end}}, int* status) {
+char* fw_{{.Name}}(char* apiKey, int root{{range .Params}}, {{.CType}} {{.Name}}{{end}}, int* status) {
 	return {{.Name}}(apiKey{{range .Params}}, {{.Name}}{{end}}, status);
 }
 {{end}}
