@@ -34,10 +34,10 @@ func (t *F) TestAcquisitions() {
 	acquisitions, _, err := t.GetAllAcquisitions()
 	t.So(err, ShouldBeNil)
 	// workaround: all-container endpoints skip some fields, single-container does not. this sets up the equality check
-	rAcquisition.Files = nil
-	rAcquisition.Notes = nil
-	rAcquisition.Tags = nil
-	rAcquisition.Info = nil
+	rAcquisition.Files = []*api.File{}
+	rAcquisition.Notes = []*api.Note{}
+	rAcquisition.Tags = []string{}
+	rAcquisition.Info = map[string]interface{}{}
 	t.So(acquisitions, ShouldContain, rAcquisition)
 
 	// Get from parent
