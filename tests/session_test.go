@@ -52,14 +52,15 @@ func (t *F) TestSessions() {
 	sessions, _, err := t.GetAllSessions()
 	t.So(err, ShouldBeNil)
 	// workaround: all-container endpoints skip some fields, single-container does not. this sets up the equality check
-	rSession.Files = nil
-	rSession.Notes = nil
-	rSession.Tags = nil
-	rSession.Info = nil
+	rSession.Files = []*api.File{}
+	rSession.Notes = []*api.Note{}
+	rSession.Tags = []string{}
+	rSession.Info = map[string]interface{}{}
 	rSession.Analyses = nil
 	rSession.Subject = &api.Subject{
 		Id:   rSession.Subject.Id,
 		Code: rSession.Subject.Code,
+		Info: map[string]interface{}{},
 	}
 	t.So(sessions, ShouldContain, rSession)
 
