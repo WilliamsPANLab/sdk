@@ -224,10 +224,10 @@ func (t *F) TestCreateProjectInRootMode() {
 	projects, _, err := t.GetAllProjects()
 	t.So(err, ShouldBeNil)
 	// workaround: all-container endpoints skip some fields, single-container does not. this sets up the equality check
-	rProject.Files = nil
-	rProject.Notes = nil
-	rProject.Tags = nil
-	rProject.Info = nil
+	rProject.Files = []*api.File{}
+	rProject.Notes = []*api.Note{}
+	rProject.Tags = []string{}
+	rProject.Info = map[string]interface{}{}
 	t.So(projects, ShouldNotContain, rProject)
 
 	// Should see project as root
