@@ -170,6 +170,72 @@ func (t *F) TestProjectFiles() {
 	t.So(rProject.Files[0].Info, ShouldBeEmpty)
 }
 
+func (t *F) TestCreateProjectInRootMode() {
+	groupId := t.createTestGroup()
+
+	group, _, err := t.GetGroup(groupId)
+	t.So(err, ShouldBeNil)
+
+	// Save user id
+	userId := group.Permissions[0].Id
+
+	// Remove permissions
+	var aerr *api.Error
+	var response *api.ModifiedResponse
+
+	_, err = t.New().Delete("groups/"+groupId+"/permissions/"+userId).Receive(&response, &aerr)
+	err = api.Coalesce(err, aerr)
+	t.So(err, ShouldBeNil)
+
+	group2, _, err := t.GetGroup(groupId)
+	t.So(group2.Permissions, ShouldResemble, []*api.Permission{})
+
+	// Now we should get an error trying to create a new project
+	project := &api.Project{
+		Name:    RandString(),
+		GroupId: groupId,
+	}
+	_, _, err = t.AddProject(project)
+	t.So(err, ShouldNotBeNil)
+	t.So(err.Error(), ShouldEqual, "(403) user not authorized to perform a POST operation on the container.")
+
+	// But we shouldn't get an error in root mode
+	projectId, _, err := t.RootClient.AddProject(project)
+	t.So(err, ShouldBeNil)
+	t.So(projectId, ShouldNotBeNil)
+
+	// Delete the implicit permission from the project
+	_, err = t.New().Delete("projects/"+projectId+"/permissions/"+userId).Receive(&response, &aerr)
+	err = api.Coalesce(err, aerr)
+	t.So(err, ShouldBeNil)
+
+	// Should get 403 error
+	rProject, _, err := t.GetProject(projectId)
+	t.So(rProject, ShouldBeNil)
+	t.So(err, ShouldNotBeNil)
+	t.So(err.Error(), ShouldEqual, "(403) user not authorized to perform a GET operation on the container.")
+
+	// Should be able to retrieve the project as root
+	rProject, _, err = t.RootClient.GetProject(projectId)
+	t.So(err, ShouldBeNil)
+	t.So(rProject, ShouldNotBeNil)
+
+	// Should not see project in list
+	projects, _, err := t.GetAllProjects()
+	t.So(err, ShouldBeNil)
+	// workaround: all-container endpoints skip some fields, single-container does not. this sets up the equality check
+	rProject.Files = []*api.File{}
+	rProject.Notes = []*api.Note{}
+	rProject.Tags = []string{}
+	rProject.Info = map[string]interface{}{}
+	t.So(projects, ShouldNotContain, rProject)
+
+	// Should see project as root
+	projects, _, err = t.RootClient.GetAllProjects()
+	t.So(err, ShouldBeNil)
+	t.So(projects, ShouldContain, rProject)
+}
+
 func (t *F) createTestProject() (string, string) {
 	groupId := t.createTestGroup()
 

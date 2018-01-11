@@ -11,6 +11,10 @@ import (
 	"github.com/dghubble/sling"
 )
 
+type RootModeQueryStruct struct {
+	Root bool `url:"root,omitempty"`
+}
+
 // NewApiKeyClient creates a Client with the given API key and options.
 // Passing a key with an invalid format will panic.
 func NewApiKeyClient(apiKey string, options ...ApiKeyClientOption) *Client {
@@ -67,6 +71,12 @@ func NewApiKeyClient(apiKey string, options ...ApiKeyClientOption) *Client {
 		Set("User-Agent", "Flywheel SDK").
 		Path("api/").
 		Client(hc)
+
+	// Set root query param for all requests, if requested
+	if config.EnableRoot {
+		var params = &RootModeQueryStruct{Root: true}
+		sc.QueryStruct(params)
+	}
 
 	return &Client{
 		Doer:  hc,

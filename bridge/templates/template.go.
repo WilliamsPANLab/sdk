@@ -25,7 +25,7 @@ type CallResult struct {
 	Data interface{} `json:"data"`
 }
 
-func makeClient(apiKey *C.char) *api.Client {
+func makeClient(apiKey *C.char, root C.int) *api.Client {
 	apiKeyRaw := C.GoString(apiKey)
 
 	// Parse the key into its components, so that we can activate some bridge-only features.
@@ -50,6 +50,11 @@ func makeClient(apiKey *C.char) *api.Client {
 	// No production instance should EVER be on a non-443 port.
 	if port != 443 {
 		options = append(options, api.InsecureNoSSLVerification)
+	}
+
+	// Enable root mode
+	if int(root) == 1 {
+		options = append(options, api.EnableRoot)
 	}
 
 	// Intentionally undocumented option: if ',InsecureUsePlaintext' is appended to the key, use HTTP.
@@ -123,7 +128,7 @@ func TestBridge(name *C.char) *C.char {
 
 {{range .Signatures}}
 //export {{.Name}}
-func {{.Name}}(apiKey *C.char{{range .Params}}, {{.Name}} {{.CgoType}}{{end}}, status *C.int) *C.char {
+func {{.Name}}(apiKey *C.char, root C.int{{range .Params}}, {{.Name}} {{.CgoType}}{{end}}, status *C.int) *C.char {
 	{{range .Params}}{{if or (eq .Type "string") (eq .Type "data")}}{{.Name}}Go := C.GoString({{.Name}})
 	{{end}}{{end}}{{if ne .ParamDataName ""}}
 	var parsed{{.ParamDataName}} {{.ParamDataType}}
@@ -132,7 +137,7 @@ func {{.Name}}(apiKey *C.char{{range .Params}}, {{.Name}} {{.CgoType}}{{end}}, s
 		return format(nil, parseErr, status)
 	}
 	{{end}}
-	{{ $length := .LastResultIndex }}{{range $ind, $val := .Results}}{{.Name}}{{if lt $ind $length}}, {{end}}{{end}} := makeClient(apiKey).{{.Name}}({{ $length := .LastParamIndex }}{{ $ShouldDeref := .ShouldDeref }}{{range $ind, $val := .Params}}{{if eq $val.Type "data"}}{{if $ShouldDeref }}&{{end}}parsed{{end}}{{$val.Name}}{{if eq $val.Type "string"}}Go{{end}}{{if lt $ind $length}}, {{end}}{{end}})
+	{{ $length := .LastResultIndex }}{{range $ind, $val := .Results}}{{.Name}}{{if lt $ind $length}}, {{end}}{{end}} := makeClient(apiKey, root).{{.Name}}({{ $length := .LastParamIndex }}{{ $ShouldDeref := .ShouldDeref }}{{range $ind, $val := .Params}}{{if eq $val.Type "data"}}{{if $ShouldDeref }}&{{end}}parsed{{end}}{{$val.Name}}{{if eq $val.Type "string"}}Go{{end}}{{if lt $ind $length}}, {{end}}{{end}})
 	return format({{.ReturnDataName}}, err, status)
 }
 {{end}}
