@@ -9,7 +9,7 @@ import (
 )
 
 func (t *F) TestAnalyses() {
-	_, _, sessionId := t.createTestSession()
+	groupId, _, sessionId := t.createTestSession()
 	gearId := t.createTestGear()
 
 	src := UploadSourceFromString("yeats.txt", "A gaze blank and pitiless as the sun,")
@@ -105,4 +105,23 @@ func (t *F) TestAnalyses() {
 	t.So(*rAna.Notes[0].Modified, ShouldHappenBefore, now2)
 	t.So(*rAna.Modified, ShouldHappenAfter, now)
 	t.So(*rAna.Modified, ShouldHappenBefore, now2)
+
+	// Access multiple analyses
+	_, _, err = t.AddSessionAnalysis(sessionId, analysis, job)
+	t.So(err, ShouldBeNil)
+
+	// Try getting analysis incorrectly
+	_, _, err = t.GetAnalyses("sessions", sessionId, "projects")
+	t.So(err, ShouldNotBeNil)
+
+	// Get all Session level analyses in group
+	analyses, _, err := t.GetAnalyses("groups", groupId, "sessions")
+	t.So(err, ShouldBeNil)
+	t.So(len(analyses), ShouldEqual, 2)
+	t.So(analyses[1], ShouldNotBeEmpty)
+
+	// Get all Project level analyses in group (Will be zero)
+	analyses, _, err = t.GetAnalyses("groups", groupId, "projects")
+	t.So(err, ShouldBeNil)
+	t.So(len(analyses), ShouldEqual, 0)
 }
