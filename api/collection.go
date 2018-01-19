@@ -161,6 +161,21 @@ func (c *Client) ModifyCollection(id string, collection *Collection) (*http.Resp
 	return resp, Coalesce(err, aerr)
 }
 
+func (c *Client) SetCollectionInfo(id string, set map[string]interface{}) (*http.Response, error) {
+	url := "collections/" + id + "/info"
+	return c.setInfo(url, set, false)
+}
+
+func (c *Client) ReplaceCollectionInfo(id string, replace map[string]interface{}) (*http.Response, error) {
+	url := "collections/" + id + "/info"
+	return c.replaceInfo(url, replace, false)
+}
+
+func (c *Client) DeleteCollectionInfoFields(id string, keys []string) (*http.Response, error) {
+	url := "collections/" + id + "/info"
+	return c.deleteInfoFields(url, keys, false)
+}
+
 func (c *Client) DeleteCollection(id string) (*http.Response, error) {
 	var aerr *Error
 
@@ -183,17 +198,17 @@ func (c *Client) ModifyCollectionFile(id string, filename string, attributes *Fi
 
 func (c *Client) SetCollectionFileInfo(id string, filename string, set map[string]interface{}) (*http.Response, error) {
 	url := "collections/" + id + "/files/" + filename + "/info"
-	return c.setInfo(url, set)
+	return c.setInfo(url, set, true)
 }
 
 func (c *Client) ReplaceCollectionFileInfo(id string, filename string, replace map[string]interface{}) (*http.Response, error) {
 	url := "collections/" + id + "/files/" + filename + "/info"
-	return c.replaceInfo(url, replace)
+	return c.replaceInfo(url, replace, true)
 }
 
 func (c *Client) DeleteCollectionFileInfoFields(id string, filename string, keys []string) (*http.Response, error) {
 	url := "collections/" + id + "/files/" + filename + "/info"
-	return c.deleteInfoFields(url, keys)
+	return c.deleteInfoFields(url, keys, true)
 }
 
 func (c *Client) DownloadFromCollection(id string, filename string, destination *DownloadSource) (chan int64, chan error) {

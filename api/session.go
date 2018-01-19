@@ -133,6 +133,21 @@ func (c *Client) ModifySession(id string, session *Session) (*http.Response, err
 	return resp, Coalesce(err, aerr)
 }
 
+func (c *Client) SetSessionInfo(id string, set map[string]interface{}) (*http.Response, error) {
+	url := "sessions/" + id + "/info"
+	return c.setInfo(url, set, false)
+}
+
+func (c *Client) ReplaceSessionInfo(id string, replace map[string]interface{}) (*http.Response, error) {
+	url := "sessions/" + id + "/info"
+	return c.replaceInfo(url, replace, false)
+}
+
+func (c *Client) DeleteSessionInfoFields(id string, keys []string) (*http.Response, error) {
+	url := "sessions/" + id + "/info"
+	return c.deleteInfoFields(url, keys, false)
+}
+
 func (c *Client) DeleteSession(id string) (*http.Response, error) {
 	var aerr *Error
 	var response *DeletedResponse
@@ -160,17 +175,17 @@ func (c *Client) ModifySessionFile(id string, filename string, attributes *FileF
 
 func (c *Client) SetSessionFileInfo(id string, filename string, set map[string]interface{}) (*http.Response, error) {
 	url := "sessions/" + id + "/files/" + filename + "/info"
-	return c.setInfo(url, set)
+	return c.setInfo(url, set, true)
 }
 
 func (c *Client) ReplaceSessionFileInfo(id string, filename string, replace map[string]interface{}) (*http.Response, error) {
 	url := "sessions/" + id + "/files/" + filename + "/info"
-	return c.replaceInfo(url, replace)
+	return c.replaceInfo(url, replace, true)
 }
 
 func (c *Client) DeleteSessionFileInfoFields(id string, filename string, keys []string) (*http.Response, error) {
 	url := "sessions/" + id + "/files/" + filename + "/info"
-	return c.deleteInfoFields(url, keys)
+	return c.deleteInfoFields(url, keys, true)
 }
 
 func (c *Client) DownloadFromSession(id string, filename string, destination *DownloadSource) (chan int64, chan error) {

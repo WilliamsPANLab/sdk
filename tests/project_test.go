@@ -73,6 +73,20 @@ func (t *F) TestProjects() {
 	_, err = t.AddProjectTag(projectId, tag)
 	t.So(err, ShouldBeNil)
 
+	// Replace Info
+	_, err = t.ReplaceProjectInfo(projectId, map[string]interface{}{
+		"foo": 3,
+		"bar": "qaz",
+	})
+	t.So(err, ShouldBeNil)
+
+	// Set info
+	_, err = t.SetProjectInfo(projectId, map[string]interface{}{
+		"foo":   42,
+		"hello": "world",
+	})
+	t.So(err, ShouldBeNil)
+
 	// Check
 	rProject, _, err = t.GetProject(projectId)
 	t.So(err, ShouldBeNil)
@@ -80,6 +94,21 @@ func (t *F) TestProjects() {
 	t.So(rProject.Notes[0].Text, ShouldEqual, message)
 	t.So(rProject.Tags, ShouldHaveLength, 1)
 	t.So(rProject.Tags[0], ShouldEqual, tag)
+
+	t.So(rProject.Info["foo"], ShouldEqual, 42)
+	t.So(rProject.Info["bar"], ShouldEqual, "qaz")
+	t.So(rProject.Info["hello"], ShouldEqual, "world")
+
+	// Delete info fields
+	_, err = t.DeleteProjectInfoFields(projectId, []string{"foo", "bar"})
+	t.So(err, ShouldBeNil)
+
+	rProject, _, err = t.GetProject(projectId)
+	t.So(err, ShouldBeNil)
+
+	t.So(rProject.Info["foo"], ShouldBeNil)
+	t.So(rProject.Info["bar"], ShouldBeNil)
+	t.So(rProject.Info["hello"], ShouldEqual, "world")
 
 	// Delete
 	_, err = t.DeleteProject(projectId)
@@ -146,6 +175,7 @@ func (t *F) TestProjectFiles() {
 	_, err = t.SetProjectFileInfo(projectId, "yeats.txt", map[string]interface{}{
 		"c": 5,
 	})
+	t.So(err, ShouldBeNil)
 
 	rProject, _, err = t.GetProject(projectId)
 	t.So(err, ShouldBeNil)

@@ -25,60 +25,46 @@ func (c *Client) modifyFileAttrs(url string, attributes *FileFields) (*http.Resp
 }
 
 // Helper func
-func (c *Client) setInfo(url string, set map[string]interface{}) (*http.Response, error) {
-	var aerr *Error
-	var response *ModifiedResponse
-
+func (c *Client) setInfo(url string, set map[string]interface{}, expectResponse bool) (*http.Response, error) {
 	body := map[string]interface{}{
 		"set": set,
 	}
-
-	resp, err := c.New().Post(url).BodyJSON(body).Receive(&response, &aerr)
-
-	// Should not have to check this count
-	// https://github.com/scitran/core/issues/680
-	if err == nil && aerr == nil && response.ModifiedCount != 1 {
-		return resp, errors.New("Modifying file returned " + strconv.Itoa(response.ModifiedCount) + " instead of 1")
-	}
-
-	return resp, Coalesce(err, aerr)
+	return c.postWithOptionalModifiedResponse(url, body, expectResponse)
 }
 
 // Helper func
-func (c *Client) replaceInfo(url string, replace map[string]interface{}) (*http.Response, error) {
-	var aerr *Error
-	var response *ModifiedResponse
-
+func (c *Client) replaceInfo(url string, replace map[string]interface{}, expectResponse bool) (*http.Response, error) {
 	body := map[string]interface{}{
 		"replace": replace,
 	}
-
-	resp, err := c.New().Post(url).BodyJSON(body).Receive(&response, &aerr)
-
-	// Should not have to check this count
-	// https://github.com/scitran/core/issues/680
-	if err == nil && aerr == nil && response.ModifiedCount != 1 {
-		return resp, errors.New("Modifying file returned " + strconv.Itoa(response.ModifiedCount) + " instead of 1")
-	}
-
-	return resp, Coalesce(err, aerr)
+	return c.postWithOptionalModifiedResponse(url, body, expectResponse)
 }
 
 // Helper func
-func (c *Client) deleteInfoFields(url string, keys []string) (*http.Response, error) {
-	var aerr *Error
-	var response *ModifiedResponse
-
+func (c *Client) deleteInfoFields(url string, keys []string, expectResponse bool) (*http.Response, error) {
 	body := map[string]interface{}{
 		"delete": keys,
 	}
+	return c.postWithOptionalModifiedResponse(url, body, expectResponse)
+}
 
-	resp, err := c.New().Post(url).BodyJSON(body).Receive(&response, &aerr)
+// Helper func
+func (c *Client) postWithOptionalModifiedResponse(url string, body interface{}, expectResponse bool) (*http.Response, error) {
+	var aerr *Error
+	var resp *http.Response
+	var err error
 
-	// Should not have to check this count
-	// https://github.com/scitran/core/issues/680
-	if err == nil && aerr == nil && response.ModifiedCount != 1 {
-		return resp, errors.New("Modifying file returned " + strconv.Itoa(response.ModifiedCount) + " instead of 1")
+	if expectResponse {
+		var response *ModifiedResponse
+		resp, err = c.New().Post(url).BodyJSON(body).Receive(&response, &aerr)
+
+		if err == nil && aerr == nil && response.ModifiedCount != 1 {
+			// Should not have to check this count
+			// https://github.com/scitran/core/issues/680
+			return resp, errors.New("Modifying file returned " + strconv.Itoa(response.ModifiedCount) + " instead of 1")
+		}
+	} else {
+		resp, err = c.New().Post(url).BodyJSON(body).Receive(nil, &aerr)
 	}
 
 	return resp, Coalesce(err, aerr)

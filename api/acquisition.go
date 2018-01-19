@@ -110,6 +110,21 @@ func (c *Client) ModifyAcquisition(id string, acquisition *Acquisition) (*http.R
 	return resp, Coalesce(err, aerr)
 }
 
+func (c *Client) SetAcquisitionInfo(id string, set map[string]interface{}) (*http.Response, error) {
+	url := "acquisitions/" + id + "/info"
+	return c.setInfo(url, set, false)
+}
+
+func (c *Client) ReplaceAcquisitionInfo(id string, replace map[string]interface{}) (*http.Response, error) {
+	url := "acquisitions/" + id + "/info"
+	return c.replaceInfo(url, replace, false)
+}
+
+func (c *Client) DeleteAcquisitionInfoFields(id string, keys []string) (*http.Response, error) {
+	url := "acquisitions/" + id + "/info"
+	return c.deleteInfoFields(url, keys, false)
+}
+
 func (c *Client) DeleteAcquisition(id string) (*http.Response, error) {
 	var aerr *Error
 	var response *DeletedResponse
@@ -137,17 +152,17 @@ func (c *Client) ModifyAcquisitionFile(id string, filename string, attributes *F
 
 func (c *Client) SetAcquisitionFileInfo(id string, filename string, set map[string]interface{}) (*http.Response, error) {
 	url := "acquisitions/" + id + "/files/" + filename + "/info"
-	return c.setInfo(url, set)
+	return c.setInfo(url, set, true)
 }
 
 func (c *Client) ReplaceAcquisitionFileInfo(id string, filename string, replace map[string]interface{}) (*http.Response, error) {
 	url := "acquisitions/" + id + "/files/" + filename + "/info"
-	return c.replaceInfo(url, replace)
+	return c.replaceInfo(url, replace, true)
 }
 
 func (c *Client) DeleteAcquisitionFileInfoFields(id string, filename string, keys []string) (*http.Response, error) {
 	url := "acquisitions/" + id + "/files/" + filename + "/info"
-	return c.deleteInfoFields(url, keys)
+	return c.deleteInfoFields(url, keys, true)
 }
 
 func (c *Client) DownloadFromAcquisition(id string, filename string, destination *DownloadSource) (chan int64, chan error) {
