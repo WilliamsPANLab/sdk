@@ -117,17 +117,17 @@ func (c *Client) ModifyProject(id string, project *Project) (*http.Response, err
 
 func (c *Client) SetProjectInfo(id string, set map[string]interface{}) (*http.Response, error) {
 	url := "projects/" + id + "/info"
-	return c.setInfo(url, set)
+	return c.setInfo(url, set, false)
 }
 
 func (c *Client) ReplaceProjectInfo(id string, replace map[string]interface{}) (*http.Response, error) {
 	url := "projects/" + id + "/info"
-	return c.replaceInfo(url, replace)
+	return c.replaceInfo(url, replace, false)
 }
 
 func (c *Client) DeleteProjectInfoFields(id string, keys []string) (*http.Response, error) {
 	url := "projects/" + id + "/info"
-	return c.deleteInfoFields(url, keys)
+	return c.deleteInfoFields(url, keys, false)
 }
 
 func (c *Client) DeleteProject(id string) (*http.Response, error) {
@@ -157,17 +157,17 @@ func (c *Client) ModifyProjectFile(id string, filename string, attributes *FileF
 
 func (c *Client) SetProjectFileInfo(id string, filename string, set map[string]interface{}) (*http.Response, error) {
 	url := "projects/" + id + "/files/" + filename + "/info"
-	return c.setInfo(url, set)
+	return c.setInfo(url, set, true)
 }
 
 func (c *Client) ReplaceProjectFileInfo(id string, filename string, replace map[string]interface{}) (*http.Response, error) {
 	url := "projects/" + id + "/files/" + filename + "/info"
-	return c.replaceInfo(url, replace)
+	return c.replaceInfo(url, replace, true)
 }
 
 func (c *Client) DeleteProjectFileInfoFields(id string, filename string, keys []string) (*http.Response, error) {
 	url := "projects/" + id + "/files/" + filename + "/info"
-	return c.deleteInfoFields(url, keys)
+	return c.deleteInfoFields(url, keys, true)
 }
 
 func (c *Client) DownloadFromProject(id string, filename string, destination *DownloadSource) (chan int64, chan error) {
