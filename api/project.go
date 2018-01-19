@@ -115,6 +115,21 @@ func (c *Client) ModifyProject(id string, project *Project) (*http.Response, err
 	return resp, Coalesce(err, aerr)
 }
 
+func (c *Client) SetProjectInfo(id string, set map[string]interface{}) (*http.Response, error) {
+	url := "projects/" + id + "/info"
+	return c.setInfo(url, set)
+}
+
+func (c *Client) ReplaceProjectInfo(id string, replace map[string]interface{}) (*http.Response, error) {
+	url := "projects/" + id + "/info"
+	return c.replaceInfo(url, replace)
+}
+
+func (c *Client) DeleteProjectInfoFields(id string, keys []string) (*http.Response, error) {
+	url := "projects/" + id + "/info"
+	return c.deleteInfoFields(url, keys)
+}
+
 func (c *Client) DeleteProject(id string) (*http.Response, error) {
 	var aerr *Error
 	var response *DeletedResponse

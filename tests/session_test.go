@@ -89,6 +89,20 @@ func (t *F) TestSessions() {
 	_, err = t.AddSessionTag(sessionId, tag)
 	t.So(err, ShouldBeNil)
 
+	// Replace Info
+	_, err = t.ReplaceSessionInfo(sessionId, map[string]interface{}{
+		"foo": 3,
+		"bar": "qaz",
+	})
+	t.So(err, ShouldBeNil)
+
+	// Set info
+	_, err = t.SetSessionInfo(sessionId, map[string]interface{}{
+		"foo":   42,
+		"hello": "world",
+	})
+	t.So(err, ShouldBeNil)
+
 	// Check
 	rSession, _, err = t.GetSession(sessionId)
 	t.So(err, ShouldBeNil)
@@ -96,6 +110,21 @@ func (t *F) TestSessions() {
 	t.So(rSession.Notes[0].Text, ShouldEqual, message)
 	t.So(rSession.Tags, ShouldHaveLength, 1)
 	t.So(rSession.Tags[0], ShouldEqual, tag)
+
+	t.So(rSession.Info["foo"], ShouldEqual, 42)
+	t.So(rSession.Info["bar"], ShouldEqual, "qaz")
+	t.So(rSession.Info["hello"], ShouldEqual, "world")
+
+	// Delete info fields
+	_, err = t.DeleteSessionInfoFields(sessionId, []string{"foo", "bar"})
+	t.So(err, ShouldBeNil)
+
+	rSession, _, err = t.GetSession(sessionId)
+	t.So(err, ShouldBeNil)
+
+	t.So(rSession.Info["foo"], ShouldBeNil)
+	t.So(rSession.Info["bar"], ShouldBeNil)
+	t.So(rSession.Info["hello"], ShouldEqual, "world")
 
 	// Delete
 	_, err = t.DeleteSession(sessionId)
@@ -161,6 +190,7 @@ func (t *F) TestSessionFiles() {
 	_, err = t.SetSessionFileInfo(sessionId, "yeats.txt", map[string]interface{}{
 		"c": 5,
 	})
+	t.So(err, ShouldBeNil)
 
 	rSession, _, err = t.GetSession(sessionId)
 	t.So(err, ShouldBeNil)

@@ -133,6 +133,21 @@ func (c *Client) ModifySession(id string, session *Session) (*http.Response, err
 	return resp, Coalesce(err, aerr)
 }
 
+func (c *Client) SetSessionInfo(id string, set map[string]interface{}) (*http.Response, error) {
+	url := "sessions/" + id + "/info"
+	return c.setInfo(url, set)
+}
+
+func (c *Client) ReplaceSessionInfo(id string, replace map[string]interface{}) (*http.Response, error) {
+	url := "sessions/" + id + "/info"
+	return c.replaceInfo(url, replace)
+}
+
+func (c *Client) DeleteSessionInfoFields(id string, keys []string) (*http.Response, error) {
+	url := "sessions/" + id + "/info"
+	return c.deleteInfoFields(url, keys)
+}
+
 func (c *Client) DeleteSession(id string) (*http.Response, error) {
 	var aerr *Error
 	var response *DeletedResponse

@@ -161,6 +161,21 @@ func (c *Client) ModifyCollection(id string, collection *Collection) (*http.Resp
 	return resp, Coalesce(err, aerr)
 }
 
+func (c *Client) SetCollectionInfo(id string, set map[string]interface{}) (*http.Response, error) {
+	url := "collections/" + id + "/info"
+	return c.setInfo(url, set)
+}
+
+func (c *Client) ReplaceCollectionInfo(id string, replace map[string]interface{}) (*http.Response, error) {
+	url := "collections/" + id + "/info"
+	return c.replaceInfo(url, replace)
+}
+
+func (c *Client) DeleteCollectionInfoFields(id string, keys []string) (*http.Response, error) {
+	url := "collections/" + id + "/info"
+	return c.deleteInfoFields(url, keys)
+}
+
 func (c *Client) DeleteCollection(id string) (*http.Response, error) {
 	var aerr *Error
 

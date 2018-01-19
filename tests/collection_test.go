@@ -99,6 +99,37 @@ func (t *F) TestCollections() {
 	t.So(changedCollection.Notes, ShouldHaveLength, 1)
 	t.So(changedCollection.Notes[0].Text, ShouldEqual, "This is a note")
 
+	// Replace Info
+	_, err = t.ReplaceCollectionInfo(cId, map[string]interface{}{
+		"foo": 3,
+		"bar": "qaz",
+	})
+	t.So(err, ShouldBeNil)
+
+	// Set info
+	_, err = t.SetCollectionInfo(cId, map[string]interface{}{
+		"foo":   42,
+		"hello": "world",
+	})
+	t.So(err, ShouldBeNil)
+
+	changedCollection, _, err = t.GetCollection(cId)
+
+	t.So(changedCollection.Info["foo"], ShouldEqual, 42)
+	t.So(changedCollection.Info["bar"], ShouldEqual, "qaz")
+	t.So(changedCollection.Info["hello"], ShouldEqual, "world")
+
+	// Delete info fields
+	_, err = t.DeleteCollectionInfoFields(cId, []string{"foo", "bar"})
+	t.So(err, ShouldBeNil)
+
+	changedCollection, _, err = t.GetCollection(cId)
+	t.So(err, ShouldBeNil)
+
+	t.So(changedCollection.Info["foo"], ShouldBeNil)
+	t.So(changedCollection.Info["bar"], ShouldBeNil)
+	t.So(changedCollection.Info["hello"], ShouldEqual, "world")
+
 	// Delete
 	_, err = t.DeleteCollection(cId)
 	t.So(err, ShouldBeNil)
@@ -162,6 +193,7 @@ func (t *F) TestCollectionFiles() {
 	_, err = t.SetCollectionFileInfo(collectionId, "yeats.txt", map[string]interface{}{
 		"c": 5,
 	})
+	t.So(err, ShouldBeNil)
 
 	rCollection, _, err = t.GetCollection(collectionId)
 	t.So(err, ShouldBeNil)

@@ -65,6 +65,20 @@ func (t *F) TestAcquisitions() {
 	_, err = t.AddAcquisitionTag(acquisitionId, tag)
 	t.So(err, ShouldBeNil)
 
+	// Replace Info
+	_, err = t.ReplaceAcquisitionInfo(acquisitionId, map[string]interface{}{
+		"foo": 3,
+		"bar": "qaz",
+	})
+	t.So(err, ShouldBeNil)
+
+	// Set info
+	_, err = t.SetAcquisitionInfo(acquisitionId, map[string]interface{}{
+		"foo":   42,
+		"hello": "world",
+	})
+	t.So(err, ShouldBeNil)
+
 	// Check
 	rAcquisition, _, err = t.GetAcquisition(acquisitionId)
 	t.So(err, ShouldBeNil)
@@ -72,6 +86,21 @@ func (t *F) TestAcquisitions() {
 	t.So(rAcquisition.Notes[0].Text, ShouldEqual, message)
 	t.So(rAcquisition.Tags, ShouldHaveLength, 1)
 	t.So(rAcquisition.Tags[0], ShouldEqual, tag)
+
+	t.So(rAcquisition.Info["foo"], ShouldEqual, 42)
+	t.So(rAcquisition.Info["bar"], ShouldEqual, "qaz")
+	t.So(rAcquisition.Info["hello"], ShouldEqual, "world")
+
+	// Delete info fields
+	_, err = t.DeleteAcquisitionInfoFields(acquisitionId, []string{"foo", "bar"})
+	t.So(err, ShouldBeNil)
+
+	rAcquisition, _, err = t.GetAcquisition(acquisitionId)
+	t.So(err, ShouldBeNil)
+
+	t.So(rAcquisition.Info["foo"], ShouldBeNil)
+	t.So(rAcquisition.Info["bar"], ShouldBeNil)
+	t.So(rAcquisition.Info["hello"], ShouldEqual, "world")
 
 	// Delete
 	_, err = t.DeleteAcquisition(acquisitionId)
@@ -138,6 +167,7 @@ func (t *F) TestAcquisitionFiles() {
 	_, err = t.SetAcquisitionFileInfo(acquisitionId, "yeats.txt", map[string]interface{}{
 		"c": 5,
 	})
+	t.So(err, ShouldBeNil)
 
 	rAcquisition, _, err = t.GetAcquisition(acquisitionId)
 	t.So(err, ShouldBeNil)

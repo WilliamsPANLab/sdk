@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -35,9 +36,12 @@ func (c *Client) setInfo(url string, set map[string]interface{}) (*http.Response
 
 	resp, err := c.New().Post(url).BodyJSON(body).Receive(&response, &aerr)
 
-	// Should not have to check this count
-	// https://github.com/scitran/core/issues/680
-	if err == nil && aerr == nil && response.ModifiedCount != 1 {
+	if err == io.EOF && response == nil {
+		// Some versions of this API return no response
+		err = nil
+	} else if err == nil && aerr == nil && response.ModifiedCount != 1 {
+		// Should not have to check this count
+		// https://github.com/scitran/core/issues/680
 		return resp, errors.New("Modifying file returned " + strconv.Itoa(response.ModifiedCount) + " instead of 1")
 	}
 
@@ -55,9 +59,12 @@ func (c *Client) replaceInfo(url string, replace map[string]interface{}) (*http.
 
 	resp, err := c.New().Post(url).BodyJSON(body).Receive(&response, &aerr)
 
-	// Should not have to check this count
-	// https://github.com/scitran/core/issues/680
-	if err == nil && aerr == nil && response.ModifiedCount != 1 {
+	if err == io.EOF && response == nil {
+		// Some versions of this API return no response
+		err = nil
+	} else if err == nil && aerr == nil && response.ModifiedCount != 1 {
+		// Should not have to check this count
+		// https://github.com/scitran/core/issues/680
 		return resp, errors.New("Modifying file returned " + strconv.Itoa(response.ModifiedCount) + " instead of 1")
 	}
 
@@ -75,9 +82,12 @@ func (c *Client) deleteInfoFields(url string, keys []string) (*http.Response, er
 
 	resp, err := c.New().Post(url).BodyJSON(body).Receive(&response, &aerr)
 
-	// Should not have to check this count
-	// https://github.com/scitran/core/issues/680
-	if err == nil && aerr == nil && response.ModifiedCount != 1 {
+	if err == io.EOF && response == nil {
+		// Some versions of this API return no response
+		err = nil
+	} else if err == nil && aerr == nil && response.ModifiedCount != 1 {
+		// Should not have to check this count
+		// https://github.com/scitran/core/issues/680
 		return resp, errors.New("Modifying file returned " + strconv.Itoa(response.ModifiedCount) + " instead of 1")
 	}
 

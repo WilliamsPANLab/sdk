@@ -110,6 +110,21 @@ func (c *Client) ModifyAcquisition(id string, acquisition *Acquisition) (*http.R
 	return resp, Coalesce(err, aerr)
 }
 
+func (c *Client) SetAcquisitionInfo(id string, set map[string]interface{}) (*http.Response, error) {
+	url := "acquisitions/" + id + "/info"
+	return c.setInfo(url, set)
+}
+
+func (c *Client) ReplaceAcquisitionInfo(id string, replace map[string]interface{}) (*http.Response, error) {
+	url := "acquisitions/" + id + "/info"
+	return c.replaceInfo(url, replace)
+}
+
+func (c *Client) DeleteAcquisitionInfoFields(id string, keys []string) (*http.Response, error) {
+	url := "acquisitions/" + id + "/info"
+	return c.deleteInfoFields(url, keys)
+}
+
 func (c *Client) DeleteAcquisition(id string) (*http.Response, error) {
 	var aerr *Error
 	var response *DeletedResponse
