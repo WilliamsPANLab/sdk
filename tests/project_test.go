@@ -147,9 +147,9 @@ func (t *F) TestProjectFiles() {
 	t.So(rProject.Files[0].Type, ShouldEqual, "text")
 
 	_, response, err := t.ModifyProjectFile(projectId, "yeats.txt", &api.FileFields{
-		Modality:     "MR",
-		Measurements: []string{"functional"},
-		Type:         "dicom",
+		Modality:     "modality",
+		Measurements: []string{"measurement"},
+		Type:         "type",
 	})
 	t.So(err, ShouldBeNil)
 
@@ -158,10 +158,10 @@ func (t *F) TestProjectFiles() {
 
 	rProject, _, err = t.GetProject(projectId)
 	t.So(err, ShouldBeNil)
-	t.So(rProject.Files[0].Modality, ShouldEqual, "MR")
+	t.So(rProject.Files[0].Modality, ShouldEqual, "modality")
 	t.So(rProject.Files[0].Measurements, ShouldHaveLength, 1)
-	t.So(rProject.Files[0].Measurements[0], ShouldEqual, "functional")
-	t.So(rProject.Files[0].Type, ShouldEqual, "dicom")
+	t.So(rProject.Files[0].Measurements[0], ShouldEqual, "measurement")
+	t.So(rProject.Files[0].Type, ShouldEqual, "type")
 
 	// Test file info
 	t.So(rProject.Files[0].Info, ShouldBeEmpty)
