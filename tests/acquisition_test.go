@@ -139,9 +139,9 @@ func (t *F) TestAcquisitionFiles() {
 	t.So(rAcquisition.Files[0].Type, ShouldEqual, "text")
 
 	_, response, err := t.ModifyAcquisitionFile(acquisitionId, "yeats.txt", &api.FileFields{
-		Modality:     "MR",
-		Measurements: []string{"functional"},
-		Type:         "dicom",
+		Modality:     "modality",
+		Measurements: []string{"measurement"},
+		Type:         "type",
 	})
 	t.So(err, ShouldBeNil)
 
@@ -150,10 +150,10 @@ func (t *F) TestAcquisitionFiles() {
 
 	rAcquisition, _, err = t.GetAcquisition(acquisitionId)
 	t.So(err, ShouldBeNil)
-	t.So(rAcquisition.Files[0].Modality, ShouldEqual, "MR")
+	t.So(rAcquisition.Files[0].Modality, ShouldEqual, "modality")
 	t.So(rAcquisition.Files[0].Measurements, ShouldHaveLength, 1)
-	t.So(rAcquisition.Files[0].Measurements[0], ShouldEqual, "functional")
-	t.So(rAcquisition.Files[0].Type, ShouldEqual, "dicom")
+	t.So(rAcquisition.Files[0].Measurements[0], ShouldEqual, "measurement")
+	t.So(rAcquisition.Files[0].Type, ShouldEqual, "type")
 
 	// Test file info
 	t.So(rAcquisition.Files[0].Info, ShouldBeEmpty)
