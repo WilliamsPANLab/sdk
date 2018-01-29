@@ -101,6 +101,9 @@ assert project['files'][0]['size'] == os.path.getsize('/tmp/download.py')
 projectDownloadUrl = fw.get_project_download_url(projectId, filename)
 assert projectDownloadUrl != ''
 
+fw.delete_project_file(projectId, filename)
+project = fw.get_project(projectId)
+assert 'files' not in project
 
 #
 ## Sessions
@@ -133,6 +136,9 @@ assert session['files'][0]['size'] == os.path.getsize('/tmp/download2.py')
 sessionDownloadUrl = fw.get_session_download_url(sessionId, filename)
 assert sessionDownloadUrl != ''
 
+fw.delete_session_file(sessionId, filename)
+session = fw.get_session(sessionId)
+assert 'files' not in session
 
 #
 ## Acquisitions
@@ -165,7 +171,6 @@ assert acq['files'][0]['size'] == os.path.getsize('/tmp/download3.py')
 acqDownloadUrl = fw.get_acquisition_download_url(acqId, filename)
 assert acqDownloadUrl != ''
 
-
 #
 ## Collections
 #
@@ -195,6 +200,10 @@ assert acq['files'][0]['size'] == os.path.getsize('/tmp/download4.py')
 
 colDownloadUrl = fw.get_collection_download_url(colId, filename)
 assert colDownloadUrl != ''
+
+fw.delete_collection_file(colId, filename)
+collection = fw.get_collection(colId)
+assert 'files' not in collection
 
 
 #

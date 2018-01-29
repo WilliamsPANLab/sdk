@@ -190,6 +190,14 @@ func (t *F) TestAcquisitionFiles() {
 	rAcquisition, _, err = t.GetAcquisition(acquisitionId)
 	t.So(err, ShouldBeNil)
 	t.So(rAcquisition.Files[0].Info, ShouldBeEmpty)
+
+	// Delete file
+	_, err = t.DeleteAcquisitionFile(acquisitionId, "yeats.txt")
+	t.So(err, ShouldBeNil)
+
+	rAcquisition, _, err = t.GetAcquisition(acquisitionId)
+	t.So(err, ShouldBeNil)
+	t.So(len(rAcquisition.Files), ShouldEqual, 0)
 }
 
 func (t *F) createTestAcquisition() (string, string, string, string) {

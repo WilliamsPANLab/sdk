@@ -150,6 +150,11 @@ func (c *Client) ModifyAcquisitionFile(id string, filename string, attributes *F
 	return c.modifyFileAttrs(url, attributes)
 }
 
+func (c *Client) DeleteAcquisitionFile(id string, filename string) (*http.Response, error) {
+	url := "acquisitions/" + id + "/files/" + filename
+	return c.deleteFile(url)
+}
+
 func (c *Client) SetAcquisitionFileInfo(id string, filename string, set map[string]interface{}) (*http.Response, error) {
 	url := "acquisitions/" + id + "/files/" + filename + "/info"
 	return c.setInfo(url, set, true)

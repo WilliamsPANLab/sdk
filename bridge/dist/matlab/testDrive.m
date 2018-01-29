@@ -87,6 +87,10 @@ assert(project.files.size == s.bytes, errMsg)
 projectDownloadUrl = fw.getProjectDownloadUrl(projectId, filename);
 assert(~strcmp(projectDownloadUrl, ''), errMsg)
 
+fw.deleteProjectFile(projectId, filename);
+project = fw.getProject(projectId);
+assert(~isfield(project, 'files'), errMsg)
+
 %% Sessions
 disp('Testing Sessions')
 
@@ -116,6 +120,10 @@ assert(session.files.size == s.bytes, errMsg)
 sessionDownloadUrl = fw.getSessionDownloadUrl(sessionId, filename);
 assert(~strcmp(sessionDownloadUrl, ''), errMsg)
 
+fw.deleteSessionFile(sessionId, filename);
+session = fw.getSession(sessionId);
+assert(~isfield(session, 'files'), errMsg)
+
 %% Acquisitions
 disp('Testing Acquisitions')
 
@@ -140,10 +148,14 @@ assert(strcmp(acq.label,'testdrive'), errMsg)
 assert(strcmp(acq.notes.text, 'This is a note'), errMsg)
 assert(strcmp(acq.files.name, filename), errMsg)
 s = dir('/tmp/download3.txt');
-assert(session.files.size == s.bytes, errMsg)
+assert(acq.files.size == s.bytes, errMsg)
 
 acqDownloadUrl = fw.getAcquisitionDownloadUrl(acqId, filename);
 assert(~strcmp(acqDownloadUrl, ''), errMsg)
+
+fw.deleteAcquisitionFile(acqId, filename);
+acq = fw.getAcquisition(acqId);
+assert(~isfield(acq, 'files'), errMsg)
 
 %% Gears
 disp('Testing Gears')

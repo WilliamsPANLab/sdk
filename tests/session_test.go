@@ -213,6 +213,14 @@ func (t *F) TestSessionFiles() {
 	rSession, _, err = t.GetSession(sessionId)
 	t.So(err, ShouldBeNil)
 	t.So(rSession.Files[0].Info, ShouldBeEmpty)
+
+	// Delete file
+	_, err = t.DeleteSessionFile(sessionId, "yeats.txt")
+	t.So(err, ShouldBeNil)
+
+	rSession, _, err = t.GetSession(sessionId)
+	t.So(err, ShouldBeNil)
+	t.So(len(rSession.Files), ShouldEqual, 0)
 }
 
 func (t *F) createTestSession() (string, string, string) {
