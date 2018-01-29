@@ -198,6 +198,14 @@ func (t *F) TestProjectFiles() {
 	rProject, _, err = t.GetProject(projectId)
 	t.So(err, ShouldBeNil)
 	t.So(rProject.Files[0].Info, ShouldBeEmpty)
+
+	// Delete file
+	_, err = t.DeleteProjectFile(projectId, "yeats.txt")
+	t.So(err, ShouldBeNil)
+
+	rProject, _, err = t.GetProject(projectId)
+	t.So(err, ShouldBeNil)
+	t.So(len(rProject.Files), ShouldEqual, 0)
 }
 
 func (t *F) TestCreateProjectInRootMode() {

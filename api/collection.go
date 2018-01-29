@@ -196,6 +196,11 @@ func (c *Client) ModifyCollectionFile(id string, filename string, attributes *Fi
 	return c.modifyFileAttrs(url, attributes)
 }
 
+func (c *Client) DeleteCollectionFile(id string, filename string) (*http.Response, error) {
+	url := "collections/" + id + "/files/" + filename
+	return c.deleteFile(url)
+}
+
 func (c *Client) SetCollectionFileInfo(id string, filename string, set map[string]interface{}) (*http.Response, error) {
 	url := "collections/" + id + "/files/" + filename + "/info"
 	return c.setInfo(url, set, true)

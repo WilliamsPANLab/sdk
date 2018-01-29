@@ -216,4 +216,12 @@ func (t *F) TestCollectionFiles() {
 	rCollection, _, err = t.GetCollection(collectionId)
 	t.So(err, ShouldBeNil)
 	t.So(rCollection.Files[0].Info, ShouldBeEmpty)
+
+	// Delete file
+	_, err = t.DeleteCollectionFile(collectionId, "yeats.txt")
+	t.So(err, ShouldBeNil)
+
+	rCollection, _, err = t.GetCollection(collectionId)
+	t.So(err, ShouldBeNil)
+	t.So(len(rCollection.Files), ShouldEqual, 0)
 }

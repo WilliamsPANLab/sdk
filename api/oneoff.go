@@ -49,6 +49,22 @@ func (c *Client) deleteInfoFields(url string, keys []string, expectResponse bool
 }
 
 // Helper func
+func (c *Client) deleteFile(url string) (*http.Response, error) {
+	var aerr *Error
+	var response *ModifiedResponse
+
+	resp, err := c.New().Delete(url).Receive(&response, &aerr)
+
+	// Should not have to check this count
+	// https://github.com/scitran/core/issues/680
+	if err == nil && aerr == nil && response.ModifiedCount != 1 {
+		return resp, errors.New("Deleting " + url + " returned " + strconv.Itoa(response.ModifiedCount) + " instead of 1")
+	}
+
+	return resp, Coalesce(err, aerr)
+}
+
+// Helper func
 func (c *Client) postWithOptionalModifiedResponse(url string, body interface{}, expectResponse bool) (*http.Response, error) {
 	var aerr *Error
 	var resp *http.Response
