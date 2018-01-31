@@ -19,58 +19,9 @@ jobs:
                 GIMME_ENV_PREFIX: "./.gimme/envs"
                 GIMME_VERSION_PREFIX: "./.gimme/versions"
 
-            - image: mongo:3.4
-              command: [--smallfiles]
-
-            - image: scitran/core:latest
-              # The scitran image really shouldn't need a pip install, but it seems that sometimes the image is out of date.
-              command: |
-                bash -c 'set -ex; env; rm -rf code/api;
-                git clone https://github.com/scitran/core code/api; cd code/api;
-                git checkout "${CIRCLE_BRANCH}" || true; cd /var/scitran;
-                time pip install -r /var/scitran/code/api/requirements.txt;
-                python /var/scitran/code/api/bin/database.py upgrade_schema;
-                /var/scitran/uwsgi-entrypoint.sh uwsgi --ini /var/scitran/config/uwsgi-config.ini --socket "[::]:9000" --processes 4 --threads 2;'
-
-            - image: nginx:stable
+            - image: scitran/core:nginx-unit
               environment:
-                # This config is representative of Flywheel systems in production as of 2017-05-22
-                NGINX_CONF: |
-                  server {
-                    listen 8080;
-                    location /api {
-                      uwsgi_pass localhost:9000;
-                      uwsgi_buffering off;
-                      uwsgi_buffers 8 1M;
-                      uwsgi_request_buffering off;
-                      include uwsgi_params;
-                      proxy_set_header Host $host;
-                      client_max_body_size 50g;
-                      add_header Access-Control-Allow-Origin $http_origin always;
-                      if ($request_method = OPTIONS) {
-                        add_header Access-Control-Allow-Origin $http_origin always;
-                        add_header Access-Control-Allow-Methods 'GET, HEAD, POST, PUT, DELETE, OPTIONS';
-                        add_header Access-Control-Allow-Headers 'Authorization, Content-Type, Content-MD5';
-                        add_header Access-Control-Max-Age 151200;
-                        return 204;
-                      }
-                    }
-                  }
-              command: |
-                bash -c '
-                  ln -sf /dev/stdout /var/log/nginx/access.log;
-                  ln -sf /dev/stderr /var/log/nginx/error.log;
-                  echo "$NGINX_CONF" > /etc/nginx/conf.d/proxy.conf;
-                  cat /etc/nginx/conf.d/proxy.conf;
-
-                  # Nginx is sometimes irritable about connecting to an upstream if the upstream does not work on the first request.
-                  # To prevent transient delays, hold off on launching nginx until the upstream port is open.
-                  # This loops forever, and eventually is killed off when prepare-environment gives up.
-
-                  while ! timeout 1 bash -c "echo > /dev/tcp/localhost/9000"; do sleep 0.5; done;
-
-                  nginx -g "daemon off;"'
-
+                SCITRAN_CORE_DRONE_SECRET: "change-me"
         steps:
             - checkout
 
@@ -117,7 +68,7 @@ jobs:
                 # command: ./make.sh test -run TestSuite/TestGetConfig
                 environment:
                   SdkTestMode:     "integration"
-                  SdkTestKey:      "localhost:8080:insecure-key"
+                  SdkTestKey:      "localhost:80:insecure-key"
                   SdkTestProtocol: "http"
 
             # - run:
@@ -137,7 +88,7 @@ jobs:
                 name: Test Wheel
                 command: ./bridge/scripts/test-wheel.sh
                 environment:
-                  SdkTestKey: "localhost:8080:insecure-key,InsecureUsePlaintext"
+                  SdkTestKey: "localhost:80:insecure-key,InsecureUsePlaintext"
                   PYTHONDONTWRITEBYTECODE: "really"
 
             # - run:

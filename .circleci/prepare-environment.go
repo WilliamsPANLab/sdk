@@ -72,7 +72,7 @@ func main() {
 	for i := 1; i <= 15; i++ {
 		err = nil
 		Println("Connecting to API...")
-		client = api.NewApiKeyClient("localhost:8080:insecure-key", api.InsecureNoSSLVerification, api.InsecureUsePlaintext)
+		client = api.NewApiKeyClient("localhost:80:insecure-key", api.InsecureNoSSLVerification, api.InsecureUsePlaintext)
 		user, _, err = client.GetCurrentUser()
 		if err == nil { break }
 		time.Sleep(1000 * time.Millisecond)
