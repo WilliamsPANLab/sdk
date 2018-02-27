@@ -20,13 +20,22 @@ type AnalysisFile struct {
 	Type         string   `json:"type,omitempty"`
 	Tags         []string `json:"tags,omitempty"`
 
-	Input  bool `json:"input,omitempty"`
-	Output bool `json:"output,omitempty"`
-
 	Info map[string]interface{} `json:"info,omitempty"`
 
 	Created  *time.Time `json:"created,omitempty"`
 	Modified *time.Time `json:"modified,omitempty"`
+}
+
+type AdhocAnalysis struct {
+	Name        string `json:"label,omitempty"`
+	Description string `json:"description,omitempty"`
+
+	// Treat this as a origin of { 'type': 'user', 'id': 'this-field' }
+	User string `json:"user,omitempty"`
+
+	Notes []*Note `json:"notes,omitempty"`
+
+	Inputs []*FileReference `json:"inputs,omitempty"`
 }
 
 type Analysis struct {
@@ -48,10 +57,14 @@ type Analysis struct {
 	Created  *time.Time `json:"created,omitempty"`
 	Modified *time.Time `json:"modified,omitempty"`
 
-	Files []*AnalysisFile `json:"files,omitempty"`
+	Inputs []*AnalysisFile `json:"inputs,omitempty"`
+	Files  []*AnalysisFile `json:"files,omitempty"`
 
 	Public      bool          `json:"public,omitempty"`
 	Permissions []*Permission `json:"permissions,omitempty"`
+
+	Tags []string               `json:"tags,omitempty"`
+	Info map[string]interface{} `json:"info,omitempty"`
 }
 
 type AnalysisListItem struct {
@@ -69,7 +82,8 @@ type AnalysisListItem struct {
 	Created  *time.Time `json:"created,omitempty"`
 	Modified *time.Time `json:"modified,omitempty"`
 
-	Files []*AnalysisFile `json:"files,omitempty"`
+	Inputs []*AnalysisFile `json:"inputs,omitempty"`
+	Files  []*AnalysisFile `json:"files,omitempty"`
 
 	Public      bool          `json:"public,omitempty"`
 	Permissions []*Permission `json:"permissions,omitempty"`
@@ -103,28 +117,7 @@ func (c *Client) GetAnalysis(id string) (*Analysis, *http.Response, error) {
 	return analysis, resp, Coalesce(err, aerr)
 }
 
-func (c *Client) AddSessionAnalysis(sessionId string, analysis *Analysis, job *Job) (string, *http.Response, error) {
-	var aerr *Error
-	var response *IdResponse
-	var result string
-
-	body := map[string]interface{}{
-		"analysis": analysis,
-		"job":      job,
-	}
-
-	// 'job=true' flag indicates new behavior
-	// https://github.com/scitran/core/issues/908#issuecomment-324766048 item 3
-	resp, err := c.New().Post("sessions/"+sessionId+"/analyses?job=true").BodyJSON(body).Receive(&response, &aerr)
-
-	if response != nil {
-		result = response.Id
-	}
-
-	return result, resp, Coalesce(err, aerr)
-}
-
-func (c *Client) AddSessionAnalysisNote(sessionId string, analysisId string, text string) (*http.Response, error) {
+func (c *Client) AddAnalysisNote(analysisId string, text string) (*http.Response, error) {
 	var aerr *Error
 	var response *ModifiedResponse
 
@@ -132,26 +125,107 @@ func (c *Client) AddSessionAnalysisNote(sessionId string, analysisId string, tex
 		Text: text,
 	}
 
-	resp, err := c.New().Post("sessions/"+sessionId+"/analyses/"+analysisId+"/notes").BodyJSON(body).Receive(&response, &aerr)
+	resp, err := c.New().Post("analyses/"+analysisId+"/notes").BodyJSON(body).Receive(&response, &aerr)
 
 	// Should not have to check this count
 	// https://github.com/scitran/core/issues/680
 	if err == nil && aerr == nil && response.ModifiedCount != 1 {
-		return resp, errors.New("Modifying session analysis on " + sessionId + " returned " + strconv.Itoa(response.ModifiedCount) + " instead of 1")
+		return resp, errors.New("Modifying analysis " + analysisId + " returned " + strconv.Itoa(response.ModifiedCount) + " instead of 1")
 	}
 
 	return resp, Coalesce(err, aerr)
 }
 
-func (c *Client) DownloadFromAnalysis(sessionId, analysisId, filename string, destination *DownloadSource) (chan int64, chan error) {
-	url := "sessions/" + sessionId + "/analyses/" + analysisId + "/files/" + filename
+func (c *Client) AddAnalysisTag(id, tag string) (*http.Response, error) {
+	var aerr *Error
+	var response *ModifiedResponse
+
+	var tagDoc interface{}
+	tagDoc = map[string]interface{}{
+		"value": tag,
+	}
+
+	resp, err := c.New().Post("analyses/"+id+"/tags").BodyJSON(tagDoc).Receive(&response, &aerr)
+
+	// Should not have to check this count
+	// https://github.com/scitran/core/issues/680
+	if err == nil && aerr == nil && response.ModifiedCount != 1 {
+		return resp, errors.New("Modifying analysis" + id + " returned " + strconv.Itoa(response.ModifiedCount) + " instead of 1")
+	}
+
+	return resp, Coalesce(err, aerr)
+}
+
+func (c *Client) SetAnalysisInfo(id string, set map[string]interface{}) (*http.Response, error) {
+	url := "analyses/" + id + "/info"
+	return c.setInfo(url, set, false)
+}
+
+func (c *Client) ReplaceAnalysisInfo(id string, replace map[string]interface{}) (*http.Response, error) {
+	url := "analyses/" + id + "/info"
+	return c.replaceInfo(url, replace, false)
+}
+
+func (c *Client) DeleteAnalysisInfoFields(id string, keys []string) (*http.Response, error) {
+	url := "analyses/" + id + "/info"
+	return c.deleteInfoFields(url, keys, false)
+}
+
+func (c *Client) UploadToAnalysis(id string, files ...*UploadSource) (chan int64, chan error) {
+	url := "analyses/" + id + "/files"
+	return c.UploadSimple(url, nil, files...)
+}
+
+func (c *Client) DownloadFromAnalysis(analysisId, filename string, destination *DownloadSource) (chan int64, chan error) {
+	url := "analyses/" + analysisId + "/files/" + filename
 	return c.DownloadSimple(url, destination)
 }
 
+func (c *Client) DownloadInputFromAnalysis(analysisId, filename string, destination *DownloadSource) (chan int64, chan error) {
+	url := "analyses/" + analysisId + "/inputs/" + filename
+	return c.DownloadSimple(url, destination)
+}
+
+func (c *Client) GetAnalysisDownloadUrl(id string, filename string) (string, *http.Response, error) {
+	return c.GetTicketDownloadUrl("analyses", id, filename)
+}
+
+func (c *Client) GetAnalysisInputDownloadUrl(id string, filename string) (string, *http.Response, error) {
+	url := "analyses/" + id + "/inputs/" + filename
+	return c.GetTicketDownloadUrlFromUrl(url)
+}
+
 // No progress reporting
-func (c *Client) DownloadFileFromAnalysis(sessionId, analysisId, filename, path string) error {
+func (c *Client) UploadFileToAnalysis(id string, path string) error {
+	return c.UploadFilesToAnalysis(id, []string{path})
+}
+
+// No progress reporting
+func (c *Client) UploadFilesToAnalysis(id string, paths []string) error {
+	src := CreateUploadSourceFromFilenames(paths...)
+	progress, result := c.UploadToAnalysis(id, src...)
+
+	// drain and report
+	for range progress {
+	}
+	return <-result
+}
+
+// No progress reporting
+func (c *Client) DownloadFileFromAnalysis(analysisId, filename, path string) error {
 	src := CreateDownloadSourceFromFilename(path)
-	progress, result := c.DownloadFromAnalysis(sessionId, analysisId, filename, src)
+	progress, result := c.DownloadFromAnalysis(analysisId, filename, src)
+
+	// drain and report
+	for range progress {
+	}
+	return <-result
+}
+
+// No progress reporting
+func (c *Client) DownloadInputFileFromAnalysis(analysisId, filename, path string) error {
+	src := CreateDownloadSourceFromFilename(path)
+	progress, result := c.DownloadInputFromAnalysis(analysisId, filename, src)
 
 	// drain and report
 	for range progress {

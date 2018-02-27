@@ -23,6 +23,8 @@ type Collection struct {
 	Public      *bool         `json:"public,omitempty"`
 	Archived    *bool         `json:"archived,omitempty"`
 	Permissions []*Permission `json:"permissions,omitempty"`
+
+	Analyses []*Analysis `json:"analyses,omitempty"`
 }
 
 type collectionNode struct {
@@ -144,6 +146,11 @@ func (c *Client) AddCollectionNote(id, text string) (*http.Response, error) {
 	}
 
 	return resp, Coalesce(err, aerr)
+}
+
+func (c *Client) AddCollectionAnalysis(collectionId string, analysis *AdhocAnalysis) (string, *http.Response, error) {
+	url := "collections/" + collectionId + "/analyses"
+	return c.addContainerAnalysis(url, analysis)
 }
 
 func (c *Client) ModifyCollection(id string, collection *Collection) (*http.Response, error) {

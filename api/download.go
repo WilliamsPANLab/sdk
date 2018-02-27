@@ -105,9 +105,15 @@ func (c *Client) DownloadSimple(url string, destination *DownloadSource) (chan i
 
 // GetTicketDownloadURL will generate a ticket for downloading a file outside of the SDK
 func (c *Client) GetTicketDownloadUrl(container string, id string, filename string) (string, *http.Response, error) {
+	url := container + "/" + id + "/files/" + filename
+	return c.GetTicketDownloadUrlFromUrl(url)
+}
+
+// GetTicketDownloadURL will generate a ticket for downloading a file outside of the SDK
+func (c *Client) GetTicketDownloadUrlFromUrl(url string) (string, *http.Response, error) {
 	var aerr *Error
 	var ticket *DownloadTicket
-	downloadUrl := container + "/" + id + "/files/" + filename + "?ticket="
+	downloadUrl := url + "?ticket="
 	resp, err := c.New().Get(downloadUrl).Receive(&ticket, &aerr)
 
 	cerr := Coalesce(err, aerr)

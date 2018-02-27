@@ -223,6 +223,48 @@ func (t *F) TestSessionFiles() {
 	t.So(len(rSession.Files), ShouldEqual, 0)
 }
 
+func (t *F) TestSessionAnalysis() {
+	_, _, sessionId := t.createTestSession()
+
+	poem := "The best lack all conviction, while the worst"
+	t.uploadText(t.UploadToSession, sessionId, "yeats.txt", poem)
+
+	filereference := &api.FileReference{
+		Id:   sessionId,
+		Type: "session",
+		Name: "yeats.txt",
+	}
+
+	analysis := &api.AdhocAnalysis{
+		Name:        RandString(),
+		Description: RandString(),
+		Inputs:      []*api.FileReference{filereference},
+	}
+
+	anaId, _, err := t.AddSessionAnalysis(sessionId, analysis)
+	t.So(err, ShouldBeNil)
+
+	session, _, err := t.GetSession(sessionId)
+	t.So(err, ShouldBeNil)
+
+	t.So(session.Analyses, ShouldHaveLength, 1)
+	rAna := session.Analyses[0]
+
+	t.So(rAna.Id, ShouldEqual, anaId)
+	t.So(rAna.User, ShouldNotBeEmpty)
+	t.So(rAna.Job, ShouldBeNil)
+	now := time.Now()
+	t.So(*rAna.Created, ShouldHappenBefore, now)
+	t.So(*rAna.Modified, ShouldHappenBefore, now)
+	t.So(rAna.Inputs, ShouldHaveLength, 1)
+	t.So(rAna.Inputs[0].Name, ShouldEqual, "yeats.txt")
+
+	// Get the list of analyses in the session
+	analyses, _, err := t.GetAnalyses("sessions", sessionId, "")
+	t.So(err, ShouldBeNil)
+	t.So(len(analyses), ShouldEqual, 1)
+}
+
 func (t *F) createTestSession() (string, string, string) {
 	groupId, projectId := t.createTestProject()
 

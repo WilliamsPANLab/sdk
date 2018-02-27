@@ -100,6 +100,11 @@ func (c *Client) AddProjectTag(id, tag string) (*http.Response, error) {
 	return resp, Coalesce(err, aerr)
 }
 
+func (c *Client) AddProjectAnalysis(projectId string, analysis *AdhocAnalysis) (string, *http.Response, error) {
+	url := "projects/" + projectId + "/analyses"
+	return c.addContainerAnalysis(url, analysis)
+}
+
 func (c *Client) ModifyProject(id string, project *Project) (*http.Response, error) {
 	var aerr *Error
 	var response *ModifiedResponse

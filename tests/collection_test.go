@@ -225,3 +225,44 @@ func (t *F) TestCollectionFiles() {
 	t.So(err, ShouldBeNil)
 	t.So(len(rCollection.Files), ShouldEqual, 0)
 }
+
+func (t *F) TestCollectionAnalysis() {
+	collection := &api.Collection{Name: RandString()}
+	collectionId, _, err := t.AddCollection(collection)
+	t.So(err, ShouldBeNil)
+
+	poem := "Things fall apart; the centre cannot hold;"
+	t.uploadText(t.UploadToCollection, collectionId, "yeats.txt", poem)
+
+	filereference := &api.FileReference{
+		Id:   collectionId,
+		Type: "collection",
+		Name: "yeats.txt",
+	}
+
+	analysis := &api.AdhocAnalysis{
+		Name:        RandString(),
+		Description: RandString(),
+		Inputs:      []*api.FileReference{filereference},
+	}
+
+	anaId, _, err := t.AddCollectionAnalysis(collectionId, analysis)
+	t.So(err, ShouldBeNil)
+	t.So(anaId, ShouldNotBeNil)
+
+	rCollection, _, err := t.GetCollection(collectionId)
+	t.So(err, ShouldBeNil)
+	t.So(rCollection.Id, ShouldEqual, collectionId)
+
+	t.So(rCollection.Analyses, ShouldHaveLength, 1)
+	rAna := rCollection.Analyses[0]
+
+	t.So(rAna.Id, ShouldEqual, anaId)
+	t.So(rAna.User, ShouldNotBeEmpty)
+	t.So(rAna.Job, ShouldBeNil)
+	now := time.Now()
+	t.So(*rAna.Created, ShouldHappenBefore, now)
+	t.So(*rAna.Modified, ShouldHappenBefore, now)
+	t.So(rAna.Inputs, ShouldHaveLength, 1)
+	t.So(rAna.Inputs[0].Name, ShouldEqual, "yeats.txt")
+}

@@ -6,3 +6,4 @@
 /flywheel.egg-info/
 /wheelhouse
 *.pyc
+test.txt

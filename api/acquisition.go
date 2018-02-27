@@ -95,6 +95,11 @@ func (c *Client) AddAcquisitionTag(id, tag string) (*http.Response, error) {
 	return resp, Coalesce(err, aerr)
 }
 
+func (c *Client) AddAcquisitionAnalysis(acquisitionId string, analysis *AdhocAnalysis) (string, *http.Response, error) {
+	url := "acquisitions/" + acquisitionId + "/analyses"
+	return c.addContainerAnalysis(url, analysis)
+}
+
 func (c *Client) ModifyAcquisition(id string, acquisition *Acquisition) (*http.Response, error) {
 	var aerr *Error
 	var response *ModifiedResponse

@@ -274,6 +274,44 @@ func (t *F) TestCreateProjectInRootMode() {
 	t.So(projects, ShouldContain, rProject)
 }
 
+func (t *F) TestProjectAnalysis() {
+	_, projectId := t.createTestProject()
+
+	poem := "The ceremony of innocence is drowned;"
+	t.uploadText(t.UploadToProject, projectId, "yeats.txt", poem)
+
+	filereference := &api.FileReference{
+		Id:   projectId,
+		Type: "project",
+		Name: "yeats.txt",
+	}
+
+	analysis := &api.AdhocAnalysis{
+		Name:        RandString(),
+		Description: RandString(),
+		Inputs:      []*api.FileReference{filereference},
+	}
+
+	anaId, _, err := t.AddProjectAnalysis(projectId, analysis)
+	t.So(err, ShouldBeNil)
+
+	// Get the list of analyses in the project
+	analyses, _, err := t.GetAnalyses("projects", projectId, "")
+	t.So(err, ShouldBeNil)
+	t.So(len(analyses), ShouldEqual, 1)
+
+	rAna := analyses[0]
+
+	t.So(rAna.Id, ShouldEqual, anaId)
+	t.So(rAna.User, ShouldNotBeEmpty)
+	t.So(rAna.JobId, ShouldBeEmpty)
+	now := time.Now()
+	t.So(*rAna.Created, ShouldHappenBefore, now)
+	t.So(*rAna.Modified, ShouldHappenBefore, now)
+	t.So(rAna.Inputs, ShouldHaveLength, 1)
+	t.So(rAna.Inputs[0].Name, ShouldEqual, "yeats.txt")
+}
+
 func (t *F) createTestProject() (string, string) {
 	groupId := t.createTestGroup()
 

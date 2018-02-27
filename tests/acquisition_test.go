@@ -200,6 +200,44 @@ func (t *F) TestAcquisitionFiles() {
 	t.So(len(rAcquisition.Files), ShouldEqual, 0)
 }
 
+func (t *F) TestAcquisitionAnalysis() {
+	_, _, _, acquisitionId := t.createTestAcquisition()
+
+	poem := "Turning and turning in the widening gyre"
+	t.uploadText(t.UploadToAcquisition, acquisitionId, "yeats.txt", poem)
+
+	filereference := &api.FileReference{
+		Id:   acquisitionId,
+		Type: "acquisition",
+		Name: "yeats.txt",
+	}
+
+	analysis := &api.AdhocAnalysis{
+		Name:        RandString(),
+		Description: RandString(),
+		Inputs:      []*api.FileReference{filereference},
+	}
+
+	anaId, _, err := t.AddAcquisitionAnalysis(acquisitionId, analysis)
+	t.So(err, ShouldBeNil)
+
+	// Get the list of analyses in the acquisition
+	analyses, _, err := t.GetAnalyses("acquisitions", acquisitionId, "")
+	t.So(err, ShouldBeNil)
+	t.So(len(analyses), ShouldEqual, 1)
+
+	rAna := analyses[0]
+
+	t.So(rAna.Id, ShouldEqual, anaId)
+	t.So(rAna.User, ShouldNotBeEmpty)
+	t.So(rAna.JobId, ShouldBeEmpty)
+	now := time.Now()
+	t.So(*rAna.Created, ShouldHappenBefore, now)
+	t.So(*rAna.Modified, ShouldHappenBefore, now)
+	t.So(rAna.Inputs, ShouldHaveLength, 1)
+	t.So(rAna.Inputs[0].Name, ShouldEqual, "yeats.txt")
+}
+
 func (t *F) createTestAcquisition() (string, string, string, string) {
 	groupId, projectId, sessionId := t.createTestSession()
 

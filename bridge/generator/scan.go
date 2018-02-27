@@ -211,6 +211,7 @@ func GetRelevantFunctionSignatures(path string) (*token.FileSet, []*ast.FuncDecl
 			"UploadToSession",
 			"UploadToAcquisition",
 			"UploadToCollection",
+			"UploadToAnalysis",
 			"Download",
 			"DownloadSimple",
 			"DownloadFromProject",
@@ -218,9 +219,7 @@ func GetRelevantFunctionSignatures(path string) (*token.FileSet, []*ast.FuncDecl
 			"DownloadFromAcquisition",
 			"DownloadFromCollection",
 			"DownloadFromAnalysis",
-
-			// Two complex data types in one signature
-			"AddSessionAnalysis",
+			"DownloadInputFromAnalysis",
 		}
 		if stringInSlice(name, blacklist) {
 			return false

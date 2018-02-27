@@ -65,6 +65,21 @@ func (c *Client) deleteFile(url string) (*http.Response, error) {
 }
 
 // Helper func
+func (c *Client) addContainerAnalysis(url string, analysis *AdhocAnalysis) (string, *http.Response, error) {
+	var aerr *Error
+	var response *IdResponse
+	var result string
+
+	resp, err := c.New().Post(url).BodyJSON(analysis).Receive(&response, &aerr)
+
+	if response != nil {
+		result = response.Id
+	}
+
+	return result, resp, Coalesce(err, aerr)
+}
+
+// Helper func
 func (c *Client) postWithOptionalModifiedResponse(url string, body interface{}, expectResponse bool) (*http.Response, error) {
 	var aerr *Error
 	var resp *http.Response

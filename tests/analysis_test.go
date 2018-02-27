@@ -8,19 +8,13 @@ import (
 	"flywheel.io/sdk/api"
 )
 
-func (t *F) TestAnalyses() {
+func (t *F) TestAnalysis() {
 	groupId, _, sessionId := t.createTestSession()
-	gearId := t.createTestGear()
 
 	src := UploadSourceFromString("yeats.txt", "A gaze blank and pitiless as the sun,")
 	progress, resultChan := t.UploadToSession(sessionId, src)
 	t.checkProgressChanEndsWith(progress, 37)
 	t.So(<-resultChan, ShouldBeNil)
-
-	analysis := &api.Analysis{
-		Name:        RandString(),
-		Description: RandString(),
-	}
 
 	filereference := &api.FileReference{
 		Id:   sessionId,
@@ -28,17 +22,13 @@ func (t *F) TestAnalyses() {
 		Name: "yeats.txt",
 	}
 
-	tag := RandString()
-
-	job := &api.Job{
-		GearId: gearId,
-		Inputs: map[string]interface{}{
-			"any-file": filereference,
-		},
-		Tags: []string{tag},
+	analysis := &api.AdhocAnalysis{
+		Name:        RandString(),
+		Description: RandString(),
+		Inputs:      []*api.FileReference{filereference},
 	}
 
-	anaId, _, err := t.AddSessionAnalysis(sessionId, analysis, job)
+	anaId, _, err := t.AddSessionAnalysis(sessionId, analysis)
 	t.So(err, ShouldBeNil)
 
 	session, _, err := t.GetSession(sessionId)
@@ -49,47 +39,21 @@ func (t *F) TestAnalyses() {
 
 	t.So(rAna.Id, ShouldEqual, anaId)
 	t.So(rAna.User, ShouldNotBeEmpty)
-	t.So(rAna.Job.State, ShouldEqual, api.Pending)
+	t.So(rAna.Job, ShouldBeNil)
 	now := time.Now()
 	t.So(*rAna.Created, ShouldHappenBefore, now)
 	t.So(*rAna.Modified, ShouldHappenBefore, now)
-	t.So(rAna.Files, ShouldHaveLength, 1)
-	t.So(rAna.Files[0].Name, ShouldEqual, "yeats.txt")
-	t.So(rAna.Files[0].Input, ShouldBeTrue)
+	t.So(rAna.Inputs, ShouldHaveLength, 1)
+	t.So(rAna.Inputs[0].Name, ShouldEqual, "yeats.txt")
 
 	// Access analysis directly
 	rAna2, _, err := t.GetAnalysis(rAna.Id)
 	t.So(err, ShouldBeNil)
 	t.So(rAna2, ShouldEqual, rAna2)
 
-	// Run the job
-	_, err = t.ChangeJobState(rAna.Job.Id, api.Running)
-	t.So(err, ShouldBeNil)
-
-	//
-	// We can't test further than this, because /engine requires drone.
-	//
-
-	// Ad-hoc implementation of engine upload
-	// src2 := UploadSourceFromString("yeats-result.txt", "And what rough beast, its hour come round at last,")
-	// url := "engine?level=analysis&id=" + anaId + "&job=" + rAna.Job.Id
-	// progress2, resultChan2 := t.UploadSimple(url, nil, src2)
-	// t.checkProgressChanEndsWith(progress2, 50)
-	// t.So(<-resultChan2, ShouldBeNil)
-
-	// Check that the result file exists
-	// session, _, err := t.GetSession(sessionId)
-	// t.So(err, ShouldBeNil)
-
-	// t.So(session.Analyses, ShouldHaveLength, 1)
-	// rAna := session.Analyses[0]
-
-	_, err = t.ChangeJobState(rAna.Job.Id, api.Complete)
-	t.So(err, ShouldBeNil)
-
 	// Analysis notes
 	text := RandString()
-	_, err = t.AddSessionAnalysisNote(sessionId, anaId, text)
+	_, err = t.AddAnalysisNote(anaId, text)
 	t.So(err, ShouldBeNil)
 
 	// Check
@@ -107,7 +71,7 @@ func (t *F) TestAnalyses() {
 	t.So(*rAna.Modified, ShouldHappenBefore, now2)
 
 	// Access multiple analyses
-	_, _, err = t.AddSessionAnalysis(sessionId, analysis, job)
+	_, _, err = t.AddSessionAnalysis(sessionId, analysis)
 	t.So(err, ShouldBeNil)
 
 	// Try getting analysis incorrectly
@@ -124,4 +88,93 @@ func (t *F) TestAnalyses() {
 	analyses, _, err = t.GetAnalyses("groups", groupId, "projects")
 	t.So(err, ShouldBeNil)
 	t.So(len(analyses), ShouldEqual, 0)
+
+	// Notes, tags
+	tag := "example-tag"
+	_, err = t.AddAnalysisTag(anaId, tag)
+	t.So(err, ShouldBeNil)
+
+	// Replace Info
+	_, err = t.ReplaceAnalysisInfo(anaId, map[string]interface{}{
+		"foo": 3,
+		"bar": "qaz",
+	})
+	t.So(err, ShouldBeNil)
+
+	// Set info
+	_, err = t.SetAnalysisInfo(anaId, map[string]interface{}{
+		"foo":   42,
+		"hello": "world",
+	})
+	t.So(err, ShouldBeNil)
+
+	// Check
+	rAna, _, err = t.GetAnalysis(anaId)
+	t.So(err, ShouldBeNil)
+	t.So(rAna.Tags, ShouldHaveLength, 1)
+	t.So(rAna.Tags[0], ShouldEqual, tag)
+
+	t.So(rAna.Info["foo"], ShouldEqual, 42)
+	t.So(rAna.Info["bar"], ShouldEqual, "qaz")
+	t.So(rAna.Info["hello"], ShouldEqual, "world")
+
+	// Delete info fields
+	_, err = t.DeleteAnalysisInfoFields(anaId, []string{"foo", "bar"})
+	t.So(err, ShouldBeNil)
+
+	rAna, _, err = t.GetAnalysis(anaId)
+	t.So(err, ShouldBeNil)
+
+	t.So(rAna.Info["foo"], ShouldBeNil)
+	t.So(rAna.Info["bar"], ShouldBeNil)
+	t.So(rAna.Info["hello"], ShouldEqual, "world")
+}
+
+func (t *F) TestAnalysisFiles() {
+	_, _, sessionId := t.createTestSession()
+
+	poemIn := "A gaze blank and pitiless as the sun,"
+
+	src := UploadSourceFromString("yeats.txt", poemIn)
+	progress, resultChan := t.UploadToSession(sessionId, src)
+	t.checkProgressChanEndsWith(progress, 37)
+	t.So(<-resultChan, ShouldBeNil)
+
+	filereference := &api.FileReference{
+		Id:   sessionId,
+		Type: "session",
+		Name: "yeats.txt",
+	}
+
+	analysis := &api.AdhocAnalysis{
+		Name:        RandString(),
+		Description: RandString(),
+		Inputs:      []*api.FileReference{filereference},
+	}
+
+	analysisId, _, err := t.AddSessionAnalysis(sessionId, analysis)
+
+	// Download the input file and check content
+	t.downloadText(t.DownloadInputFromAnalysis, analysisId, "yeats.txt", poemIn)
+
+	// Test unauthorized download with ticket for the file
+	t.downloadTextWithTicket(t.GetAnalysisInputDownloadUrl, analysisId, "yeats.txt", poemIn)
+
+	poemOut := "Surely the Second Coming is at hand."
+	t.uploadText(t.UploadToAnalysis, analysisId, "yeats-out.txt", poemOut)
+
+	rAnalysis, _, err := t.GetAnalysis(analysisId)
+	t.So(err, ShouldBeNil)
+	t.So(rAnalysis.Files, ShouldHaveLength, 1)
+	t.So(rAnalysis.Files[0].Name, ShouldEqual, "yeats-out.txt")
+	t.So(rAnalysis.Files[0].Size, ShouldEqual, 36)
+	t.So(rAnalysis.Files[0].Mimetype, ShouldEqual, "text/plain")
+
+	// Download the same file and check content
+	t.downloadText(t.DownloadFromAnalysis, analysisId, "yeats-out.txt", poemOut)
+
+	// Test unauthorized download with ticket for the file
+	t.downloadTextWithTicket(t.GetAnalysisDownloadUrl, analysisId, "yeats-out.txt", poemOut)
+
+	// File metadata / info modification not supported for analyses
 }

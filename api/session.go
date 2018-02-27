@@ -118,6 +118,11 @@ func (c *Client) AddSessionTag(id, tag string) (*http.Response, error) {
 	return resp, Coalesce(err, aerr)
 }
 
+func (c *Client) AddSessionAnalysis(sessionId string, analysis *AdhocAnalysis) (string, *http.Response, error) {
+	url := "sessions/" + sessionId + "/analyses"
+	return c.addContainerAnalysis(url, analysis)
+}
+
 func (c *Client) ModifySession(id string, session *Session) (*http.Response, error) {
 	var aerr *Error
 	var response *ModifiedResponse
