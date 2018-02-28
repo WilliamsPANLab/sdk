@@ -278,8 +278,12 @@ func (t *F) createTestProject() (string, string) {
 	groupId := t.createTestGroup()
 
 	project := &api.Project{
-		Name:    RandString(),
-		GroupId: groupId,
+		Name:        RandString(),
+		GroupId:     groupId,
+		Description: "This is a description",
+		Info: map[string]interface{}{
+			"some-key": 37,
+		},
 	}
 	projectId, _, err := t.AddProject(project)
 	t.So(err, ShouldBeNil)

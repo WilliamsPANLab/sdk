@@ -30,7 +30,7 @@ type AnalysisFile struct {
 }
 
 type Analysis struct {
-	Id     string              `json:"_id,omitempty"`
+	Id     string              `json:"_id,omitempty" bson:"_id"`
 	Name   string              `json:"label,omitempty"`
 	Parent *ContainerReference `json:"parent,omitempty"`
 
@@ -55,7 +55,7 @@ type Analysis struct {
 }
 
 type AnalysisListItem struct {
-	Id     string              `json:"_id,omitempty"`
+	Id     string              `json:"_id,omitempty" bson:"_id"`
 	Name   string              `json:"label,omitempty"`
 	Parent *ContainerReference `json:"parent,omitempty"`
 

@@ -22,6 +22,10 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
+// Based on a string from api.py, this user ID regex is a superset of the allowable format of a group ID, user ID, note ID, database ID.
+// It's not the consumer's business what the format of the database keys are, so we do not have a mongo DB ID regex.
+var idRegex = regexp.MustCompile("^[0-9a-zA-Z.@_-]+$")
+
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 var hexRunes = []rune("0123456789abcdef")
 
@@ -89,29 +93,54 @@ func ShouldBeSameTimeAs(actual interface{}, expected ...interface{}) string {
 const (
 	invalidRegex     = "Invalid match expression '%s': %s"
 	regexBadMatch    = "Expected '%s' to match pattern: '%s'"
+	regexBadMatch2   = "Expected '%s' to NOT match pattern: '%s'"
 	shouldUseStrings = "You must provide string instances as arguments to this assertion."
 )
+
+func regexMatch(invert bool, actual interface{}, pattern ...interface{}) string {
+	actualString, firstOk := actual.(string)
+	patternString, secondOk := pattern[0].(string)
+	regex, thirdOk := pattern[0].(*regexp.Regexp)
+	var err error
+
+	if !firstOk || (!secondOk && !thirdOk) {
+		// Does not disclose that a compiled regex would work here, oh well.
+		return shouldUseStrings
+	}
+
+	// Compile or use regex
+	if secondOk {
+		regex, err = regexp.Compile(patternString)
+		if err != nil {
+			return fmt.Sprintf(invalidRegex, patternString, err.Error())
+		}
+	} else {
+		patternString = regex.String() // For printing failures
+	}
+
+	matched := regex.MatchString(actualString)
+
+	if !matched && !invert {
+		return fmt.Sprintf(regexBadMatch, actualString, patternString)
+	} else if matched && invert {
+		return fmt.Sprintf(regexBadMatch2, actualString, patternString)
+	}
+
+	return success
+}
 
 func ShouldMatchRegex(actual interface{}, pattern ...interface{}) string {
 	if fail := need(1, pattern); fail != success {
 		return fail
 	}
+	return regexMatch(false, actual, pattern...)
+}
 
-	actualString, firstOk := actual.(string)
-	patternString, secondOk := pattern[0].(string)
-
-	if !firstOk || !secondOk {
-		return shouldUseStrings
+func ShouldNotMatchRegex(actual interface{}, pattern ...interface{}) string {
+	if fail := need(1, pattern); fail != success {
+		return fail
 	}
-
-	matched, err := regexp.MatchString(patternString, actualString)
-	if err != nil {
-		return fmt.Sprintf(invalidRegex, patternString, err.Error())
-	}
-	if !matched {
-		return fmt.Sprintf(regexBadMatch, actualString, patternString)
-	}
-	return success
+	return regexMatch(true, actual, pattern...)
 }
 
 func UploadSourceFromString(name, src string) *api.UploadSource {

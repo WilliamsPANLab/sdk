@@ -8,8 +8,8 @@ import (
 )
 
 type Collection struct {
-	Id          string `json:"_id,omitempty"`
-	Name        string `json:"label,omitempty"`
+	Id          string `json:"_id,omitempty" bson:"_id"`
+	Name        string `json:"label,omitempty" bson:"name"`
 	Curator     string `json:"curator,omitempty"`
 	Description string `json:"description,omitempty"`
 

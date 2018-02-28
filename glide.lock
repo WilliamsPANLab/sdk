@@ -14,9 +14,9 @@ imports:
   version: 2df9a531813370438a4d79bfc33e21f58063ed87
 - name: github.com/spf13/pflag
   version: e57e3eeb33f795204c1ca35f56c44f83227c6e66
-- name: gopkg.in/mgo.v2
-  version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
-  repo: https://github.com/go-mgo/mgo
+- name: github.com/globalsign/mgo
+  version: baa28fcb8e7d5dfab92026c0920cb6c9ae72faa2
+  repo: https://github.com/globalsign/mgo
 testImports:
 - name: github.com/smartystreets/assertions
   version: c9ee7d9e9a2aeec0bee7c4a516f3e0ad7cb7e558

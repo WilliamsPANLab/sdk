@@ -52,7 +52,7 @@ const (
 )
 
 type GearDoc struct {
-	Id       string       `json:"_id,omitempty"`
+	Id       string       `json:"_id,omitempty" bson:"_id"`
 	Category GearCategory `json:"category,omitempty"`
 
 	Gear   *Gear       `json:"gear,omitempty"`

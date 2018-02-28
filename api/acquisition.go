@@ -8,8 +8,8 @@ import (
 )
 
 type Acquisition struct {
-	Id        string `json:"_id,omitempty"`
-	Name      string `json:"label,omitempty"`
+	Id        string `json:"_id,omitempty" bson:"_id"`
+	Name      string `json:"label,omitempty" bson:"label"`
 	SessionId string `json:"session,omitempty"`
 
 	Timestamp *time.Time `json:"timestamp,omitempty"`

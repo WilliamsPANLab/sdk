@@ -5,7 +5,7 @@ import (
 	. "log"
 	"time"
 
-	"gopkg.in/mgo.v2"
+	"github.com/globalsign/mgo"
 
 	"flywheel.io/sdk/api"
 )

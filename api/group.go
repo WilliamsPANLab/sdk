@@ -8,8 +8,8 @@ import (
 )
 
 type Group struct {
-	Id   string `json:"_id,omitempty"`
-	Name string `json:"label,omitempty"`
+	Id   string `json:"_id,omitempty" bson:"_id"`
+	Name string `json:"label,omitempty" bson:"label"`
 
 	Created  *time.Time `json:"created,omitempty"`
 	Modified *time.Time `json:"modified,omitempty"`
