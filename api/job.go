@@ -73,7 +73,7 @@ type JobProfile struct {
 
 type Job struct {
 	Id     string `json:"id,omitempty" bson:"_id"`
-	GearId string `json:"gear_id,omitempty"`
+	GearId string `json:"gear_id,omitempty" bson:"gear_id"`
 
 	State   JobState `json:"state,omitempty"`
 	Attempt int      `json:"attempt,omitempty"`
