@@ -120,9 +120,6 @@ func (t *F) TestDbAccess() {
 		Name: "yeats.txt",
 	}
 
-	JobQueue.Lock()
-	defer JobQueue.Unlock()
-
 	tag := RandString()
 	sendJob := &api.Job{
 		GearId: gearId,

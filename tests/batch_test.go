@@ -49,9 +49,6 @@ func (t *F) TestBatch() {
 	t.So(err, ShouldBeNil)
 	t.So(batches, ShouldContain, rBatch)
 
-	JobQueue.Lock()
-	defer JobQueue.Unlock()
-
 	// Start
 	jobs, _, err := t.StartBatch(proposal.Id)
 	t.So(err, ShouldBeNil)
