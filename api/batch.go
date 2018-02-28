@@ -6,7 +6,7 @@ import (
 )
 
 type Batch struct {
-	Id     string `json:"_id,omitempty"`
+	Id     string `json:"_id,omitempty" bson:"_id"`
 	GearId string `json:"gear_id,omitempty"`
 
 	State  JobState `json:"state,omitempty"`
@@ -20,7 +20,7 @@ type Batch struct {
 }
 
 type BatchProposal struct {
-	Id     string                 `json:"_id,omitempty"`
+	Id     string                 `json:"_id,omitempty" bson:"_id"`
 	GearId string                 `json:"gear_id,omitempty"`
 	Config map[string]interface{} `json:"config,omitempty"`
 	State  string                 `json:"state,omitempty"`

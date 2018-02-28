@@ -8,8 +8,8 @@ import (
 )
 
 type Project struct {
-	Id          string `json:"_id,omitempty"`
-	Name        string `json:"label,omitempty"`
+	Id          string `json:"_id,omitempty" bson:"_id"`
+	Name        string `json:"label,omitempty" bson:"label"`
 	GroupId     string `json:"group,omitempty"`
 	Description string `json:"description,omitempty"`
 

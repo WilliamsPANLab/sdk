@@ -1,12 +1,15 @@
 package tests
 
 import (
+	"sync"
 	"time"
 
 	. "github.com/smartystreets/assertions"
 
 	"flywheel.io/sdk/api"
 )
+
+var JobQueue sync.Mutex
 
 func (t *F) TestJobs() {
 	_, _, _, acquisitionId := t.createTestAcquisition()
@@ -34,6 +37,9 @@ func (t *F) TestJobs() {
 
 		Tags: []string{tag},
 	}
+
+	JobQueue.Lock()
+	defer JobQueue.Unlock()
 
 	// Add
 	jobId, _, err := t.AddJob(job)

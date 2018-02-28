@@ -29,6 +29,7 @@ circleci build
 If you want to test manually, you can configure the test suite with these environment variables:
 
 * `SdkTestKey`: Set this to an API key. Defaults to `localhost:8443:change-me`.
+* `SdkTestMongo`: Set this to a mongo connection string. If not set, database tests are skipped.
 * `SdkTestDebug`: Setting this to any value will cause each test to print an HTTP/1.1 representation of each request. Best used to debug a single failing test.
 
 To run the integration test suite against a running API:

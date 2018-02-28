@@ -138,6 +138,7 @@ jobs:
                 command: ./bridge/scripts/test-wheel.sh
                 environment:
                   SdkTestKey: "localhost:8080:insecure-key,InsecureUsePlaintext"
+                  SdkTestMongo: "localhost"
                   PYTHONDONTWRITEBYTECODE: "really"
 
             # - run:

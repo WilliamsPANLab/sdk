@@ -82,69 +82,58 @@ type F struct {
 	*api.Client
 
 	RootClient *api.Client
+
+	MongoString string
 }
 
 const (
-	// SdkTestMode is the environment variable that sets the test mode.
-	// Valid values are "unit" and "integration".
-	SdkTestMode = "SdkTestMode"
-
 	// SdkTestKey is the environment variable that sets the test API key.
 	// Valid values are an API key: "localhost:8443:change-me"
 	// No affect in unit test mode.
 	SdkTestKey = "SdkTestKey"
+
+	// SdkTestKey is the environment variable that controls the DB access.
+	// Valid values are a mongo connection string: "localhost:9000"
+	// No affect in unit test mode.
+	SdkTestMongo = "SdkTestMongo"
 
 	// SdkTestKey is the environment variable that sets the API protocol.
 	// Valid values are "https" and "http".
 	// No affect in unit test mode.
 	SdkProtocolKey = "SdkTestProtocol"
 
-	DefaultMode     = "integration"
 	DefaultKey      = "localhost:8443:change-me"
 	DefaultProtocol = "https"
 )
 
 // makeClient reads settings from the environment and returns the corresponding client
 func makeClient(root bool) *api.Client {
-	mode, modeSet := os.LookupEnv(SdkTestMode)
-
-	if !modeSet {
-		mode = DefaultMode
-	}
-
 	var client *api.Client
 
-	if mode == "unit" {
-		panic("Unit test mode is not supported yet")
+	key, keySet := os.LookupEnv(SdkTestKey)
+	protocol, protocolSet := os.LookupEnv(SdkProtocolKey)
 
-	} else if mode == "integration" {
-		key, keySet := os.LookupEnv(SdkTestKey)
-		protocol, protocolSet := os.LookupEnv(SdkProtocolKey)
-
-		if !keySet {
-			key = DefaultKey
-		}
-
-		if !protocolSet {
-			protocol = DefaultProtocol
-		}
-
-		opts := []api.ApiKeyClientOption{api.InsecureNoSSLVerification}
-
-		if protocol == "http" {
-			opts = append(opts, api.InsecureUsePlaintext)
-		} else if protocol != "https" {
-			panic("Protocol must be http or https, was " + protocol)
-		}
-
-		if root {
-			opts = append(opts, api.EnableRoot)
-		}
-
-		client = api.NewApiKeyClient(key, opts...)
-	} else {
-		panic("Unsupported test mode " + mode)
+	if !keySet {
+		key = DefaultKey
 	}
+
+	if !protocolSet {
+		protocol = DefaultProtocol
+	}
+
+	opts := []api.ApiKeyClientOption{api.InsecureNoSSLVerification}
+
+	if protocol == "http" {
+		opts = append(opts, api.InsecureUsePlaintext)
+	} else if protocol != "https" {
+		panic("Protocol must be http or https, was " + protocol)
+	}
+
+	if root {
+		opts = append(opts, api.EnableRoot)
+	}
+
+	client = api.NewApiKeyClient(key, opts...)
 
 	return client
 }
@@ -153,6 +142,7 @@ func makeClient(root bool) *api.Client {
 var once sync.Once
 var client *api.Client
 var rootClient *api.Client
+var mongoString string
 
 // Setup prepares the fixture with SDK client state. Runs once per test.
 func (t *F) Setup() {
@@ -166,10 +156,12 @@ func (t *F) Setup() {
 	once.Do(func() {
 		client = makeClient(false)
 		rootClient = makeClient(true)
+		mongoString, _ = os.LookupEnv(SdkTestMongo)
 	})
 
 	t.Client = client
 	t.RootClient = rootClient
+	t.MongoString = mongoString
 }
 
 /*

@@ -68,7 +68,7 @@ const (
 )
 
 type Job struct {
-	Id     string `json:"id,omitempty"`
+	Id     string `json:"id,omitempty" bson:"_id"`
 	GearId string `json:"gear_id,omitempty"`
 
 	State   JobState `json:"state,omitempty"`

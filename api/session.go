@@ -8,7 +8,7 @@ import (
 )
 
 type Subject struct {
-	Id   string `json:"_id,omitempty"`
+	Id   string `json:"_id,omitempty" bson:"_id"`
 	Code string `json:"code,omitempty"`
 
 	Firstname string `json:"firstname,omitempty"`
@@ -20,8 +20,8 @@ type Subject struct {
 }
 
 type Session struct {
-	Id        string `json:"_id,omitempty"`
-	Name      string `json:"label,omitempty"`
+	Id        string `json:"_id,omitempty" bson:"_id"`
+	Name      string `json:"label,omitempty" bson:"label"`
 	GroupId   string `json:"group,omitempty"`
 	ProjectId string `json:"project,omitempty"`
 

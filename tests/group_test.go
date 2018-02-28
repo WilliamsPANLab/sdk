@@ -71,8 +71,9 @@ func (t *F) TestGroups() {
 
 func (t *F) createTestGroup() string {
 	groupId := RandStringLower() // conform to group ID regex
+	groupName := RandString()
 
-	_, _, err := t.AddGroup(&api.Group{Id: groupId})
+	_, _, err := t.AddGroup(&api.Group{Id: groupId, Name: groupName})
 	t.So(err, ShouldBeNil)
 
 	return groupId

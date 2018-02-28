@@ -17,7 +17,7 @@ type Key struct {
 
 // User represents a single user.
 type User struct {
-	Id        string `json:"_id,omitempty"`
+	Id        string `json:"_id,omitempty" bson:"_id"`
 	Email     string `json:"email,omitempty"`
 	Firstname string `json:"firstname,omitempty"`
 	Lastname  string `json:"lastname,omitempty"`

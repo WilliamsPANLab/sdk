@@ -230,6 +230,19 @@ func (t *F) createTestSession() (string, string, string) {
 	session := &api.Session{
 		Name:      sessionName,
 		ProjectId: projectId,
+		Info: map[string]interface{}{
+			"some-key": 37,
+		},
+		Subject: &api.Subject{
+			Code:      RandStringLower(),
+			Firstname: RandString(),
+			Lastname:  RandString(),
+			Sex:       "other",
+			Age:       56,
+			Info: map[string]interface{}{
+				"some-subject-key": 37,
+			},
+		},
 	}
 	sessionId, _, err := t.AddSession(session)
 	t.So(err, ShouldBeNil)

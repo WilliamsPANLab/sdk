@@ -1,12 +1,17 @@
 package: flywheel.io/sdk
-homepage: https://github.com/flywheel-io/core-sdk
+
+homepage: https://github.com/flywheel-io/sdk
 license: MIT
+
 owners:
 - name:  Nathaniel Kofalt
   email: nathaniel.kofalt@gmail.com
+
 import:
-- package: gopkg.in/mgo.v2
-  repo:    https://github.com/go-mgo/mgo
-  version: v2
+
+- package: github.com/globalsign/mgo
+  repo:    https://github.com/globalsign/mgo
+  version: master
+
 - package: github.com/smartystreets/gunit
   repo:    https://github.com/kofalt/gunit
