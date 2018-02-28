@@ -67,6 +67,10 @@ const (
 	JobFailure
 )
 
+type JobProfile struct {
+	Elapsed int64 `json:"elapsed, omitempty"`
+}
+
 type Job struct {
 	Id     string `json:"id,omitempty" bson:"_id"`
 	GearId string `json:"gear_id,omitempty"`
@@ -87,6 +91,8 @@ type Job struct {
 
 	Created  *time.Time `json:"created,omitempty"`
 	Modified *time.Time `json:"modified,omitempty"`
+
+	Profile JobProfile `json:"profile,omitempty"`
 }
 
 type JobLogStatement struct {
