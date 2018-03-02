@@ -159,14 +159,16 @@ func (c *Client) ModifyJob(id string, job *Job) (*http.Response, error) {
 	return resp, Coalesce(err, aerr)
 }
 
-func (c *Client) StartNextPendingJob(tags ...string) (JobRetrieval, *Job, *http.Response, error) {
+func (c *Client) StartNextPendingJob(peek bool, tags ...string) (JobRetrieval, *Job, *http.Response, error) {
 	var aerr *Error
 	var job *Job
 
 	params := &struct {
 		Tags []string `url:"tags,omitempty"`
+		Peek bool `url:"peek,omitempty"`
 	}{
 		Tags: tags,
+		Peek: peek,
 	}
 
 	resp, err := c.New().Get("jobs/next").QueryStruct(params).Receive(&job, &aerr)
