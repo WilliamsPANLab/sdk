@@ -117,7 +117,7 @@ func (t *F) TestJobQueue() {
 	t.So(rJob.State, ShouldEqual, api.Pending)
 
 	// Run
-	jr, rJob, _, err := t.StartNextPendingJob(tag)
+	jr, rJob, _, err := t.StartNextPendingJob(false, tag)
 	t.So(err, ShouldBeNil)
 	t.So(rJob, ShouldNotBeNil)
 	t.So(jr, ShouldEqual, api.JobAquired)
@@ -126,7 +126,7 @@ func (t *F) TestJobQueue() {
 	t.So(rJob.Request.Target.Dir, ShouldEqual, "/flywheel/v0")
 
 	// Next fetch with tag should not find any jobs
-	jr, emptyJob, _, err := t.StartNextPendingJob(tag)
+	jr, emptyJob, _, err := t.StartNextPendingJob(false, tag)
 	t.So(err, ShouldBeNil)
 	t.So(emptyJob, ShouldBeNil)
 	t.So(jr, ShouldEqual, api.NoPendingJobs)

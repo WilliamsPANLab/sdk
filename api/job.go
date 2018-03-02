@@ -165,7 +165,7 @@ func (c *Client) StartNextPendingJob(peek bool, tags ...string) (JobRetrieval, *
 
 	params := &struct {
 		Tags []string `url:"tags,omitempty"`
-		Peek bool `url:"peek,omitempty"`
+		Peek bool     `url:"peek,omitempty"`
 	}{
 		Tags: tags,
 		Peek: peek,
