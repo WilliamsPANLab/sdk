@@ -50,3 +50,6 @@ mv dist/matlab/flywheelBridge.h dist/matlab/flywheelBridgeSimple.h
 
 # Matlab-binary needs the SDK binary
 cp dist/binary/sdk dist/matlab-binary/sdk
+
+# Python needs a version number
+dist/binary/sdk version | tail -n 1 | cut -d ' ' -f 3 > dist/python/VERSION

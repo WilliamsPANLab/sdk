@@ -16,7 +16,14 @@ ln -s workspace/src/flywheel.io/sdk sdk
 ```
 
 This builds the golang SDK.<br/>
-For other languages, check out the [bridge readme](bridge).
+For Python, see below. For other languages, check out the [bridge readme](bridge).
+
+### Python
+
+```bash
+./sdk/bridge/make.sh
+pip install sdk/bridge/dist/python
+```
 
 ## Testing
 

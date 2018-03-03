@@ -1,23 +1,15 @@
 from setuptools import setup, find_packages
+import os
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
 install_requires = [
     'six>=1.10.0',
 ]
 
 def _load_version():
-	import subprocess
-
-	p = subprocess.Popen('../binary/sdk version', stdout=subprocess.PIPE, shell=True)
-	(output, error) = p.communicate()
-	status = p.wait()
-
-	if error is not None:
-		raise Exception('Could not call sdk binary: Error was' + str(err))
-	elif status != 0:
-		raise Exception('Could not call sdk binary: Status was' + str(status))
-
-	return output.split()[2].decode('utf-8')
-
+	with open(os.path.join(script_dir, 'VERSION'), 'r') as f:
+		return f.read()
 
 setup(
     name = 'flywheel',
@@ -28,6 +20,6 @@ setup(
     url = 'https://github.com/flywheel-io/sdk',
     license = 'MIT',
     packages = find_packages(),
-    package_data = {'': ['flywheelBridge.*']},
+    package_data = {'': ['flywheelBridge.*', 'VERSION']},
     install_requires = install_requires,
 )
